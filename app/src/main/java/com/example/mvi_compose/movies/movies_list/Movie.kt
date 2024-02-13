@@ -14,6 +14,8 @@ data class Movie(
     var id: Int,
     @ColumnInfo(name = "vote_count")
     var vote_count: Int,
+    @ColumnInfo(name = "random_delay")
+    var random_delay: Long,
     @ColumnInfo(name = "video")
     var video: Boolean,
     @ColumnInfo(name = "vote_average")

@@ -12,6 +12,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -36,12 +37,12 @@ import com.example.mvi_compose.ui.theme.PurpleGrey40
 @Composable
 fun MoviesScreen(viewModel: CounterViewModel, onMovieClick: (Movie) -> Unit) {
 
-    val moviesState = viewModel.state.collectAsStateWithLifecycle().value
+    val moviesState = viewModel.state.collectAsState() // .collectAsStateWithLifecycle() // .value
     moviesState.let {
-        if (moviesState.loading) LoadingScreen()
-        else if( moviesState.error.isNotEmpty() )
-            ErrorScreen(error = moviesState.error)
-        else if ( moviesState.movies.isNotEmpty()) MoviesListScreen(movies = moviesState.movies, onMovieClick)
+        if (moviesState.value.loading) LoadingScreen()
+        else if( moviesState.value.error.isNotEmpty() )
+            ErrorScreen(error = moviesState.value.error)
+        else if ( moviesState.value.movies.isNotEmpty()) MoviesListScreen(movies = moviesState.value.movies, onMovieClick)
     }
 }
 
@@ -62,11 +63,11 @@ fun MoviesListScreen(movies: List<Movie>, onMovieClick: (Movie) -> Unit) {
             }
         ) { movie ->
             Log.d(REST_API_CALL, "movie image is: ${BuildConfig.IMAGE_URL}${movie.poster_path}")
-            Row(
-                Modifier
-                    .fillParentMaxWidth()
-                    .fillParentMaxHeight(.5f),
-            ) {
+//            Row(
+//                Modifier
+//                    .fillParentMaxWidth()
+//                    .fillParentMaxHeight(.5f),
+//            ) {
                 MovieItem(movie, onMovieClick)
 //                for ((index, item) in row.withIndex()) {
 //                    Box(
@@ -77,7 +78,7 @@ fun MoviesListScreen(movies: List<Movie>, onMovieClick: (Movie) -> Unit) {
 //                        MovieItem(item, onMovieClick)
 //                    }
 //                }
-            }
+//            }
         }
     }
 }
@@ -94,7 +95,10 @@ fun MovieItem(movie: Movie, onMovieClick: (Movie) -> Unit) {
             })
     ) {
         AsyncImage(model = "${BuildConfig.IMAGE_URL}${movie.poster_path}", contentDescription = "Awesome image_${movie.id}",
-            modifier = Modifier.fillMaxSize().border(2.dp, Color.Green, RectangleShape))
+            modifier = Modifier
+                .size(100.dp)
+                .border(2.dp, Color.Green, RectangleShape))
+        Text(text = "Random delay: ${movie.random_delay}", modifier = Modifier.padding(10.dp))
 //        Image(
 //            painter = rememberImagePainter(data = "${BuildConfig.IMAGE_URL}${movie.poster_path}"),
 //            contentScale = ContentScale.FillBounds,
@@ -134,6 +138,7 @@ fun MoviesListPreview() {
         popularity = 88.5,
         video = true,
         overview = "Spiderman movies is about man turning into a spider which can fly and attack bad people falling them dead",
+        random_delay = 0L
     )
 //    MVIComposeSampleTheme {
 //        MoviesListScreen(

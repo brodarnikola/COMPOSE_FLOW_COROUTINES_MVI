@@ -1,10 +1,12 @@
 package com.example.mvi_compose.ui
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.movies_list.Movie
 import com.example.mvi_compose.movies.movies_list.MovieRepo
 import com.example.mvi_compose.movies.network.NetworkResult
+import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
 import com.example.mvi_compose.movies.utils.MovieDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
@@ -21,12 +23,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class CounterViewModel @Inject constructor(
@@ -70,14 +74,27 @@ class CounterViewModel @Inject constructor(
                     _state.update { it.copy(loading = false, movies = result.data.results) }
                     val listFetchImages = mutableListOf<Deferred<Unit>>()
                     result.data.results.forEachIndexed { index, movie ->
-                        if( index < 2 )
+                         if( index < 6 ) {
+                            movieDao.insertMovie(movie)
+                            val movies = movieDao.fetchFavouriteMovies()
+
                             listFetchImages.add(
                                 async {
-                                    downloadImage(movie)
+                                    val random = Random.nextInt(500) + 500
+                                    Log.d(REST_API_CALL, "Random delay is START: ${random} .. ${result.data.results[index].title}")
+                                    delay(random.toLong())
+                                    val test9 = result.data.results.set(index, result.data.results[index].copy(random_delay = random.toLong()))
+                                    Log.d(REST_API_CALL, "Random delay is FINISH: ${result.data.results[index].title}")
+                                    withContext(Dispatchers.Main) {
+                                        _state.update { it.copy(movies = result.data.results) }
+                                    }
+                                    // downloadImage(movie)
                                 }
                             )
+                         }
                     }
                     listFetchImages.awaitAll()        //
+                    _state.update { it.copy(movies = result.data.results) }
 
 
 //                    val deferreds = listOf(     // fetch two docs at the same time
@@ -93,7 +110,6 @@ class CounterViewModel @Inject constructor(
     private fun downloadImage(movie: Movie) {
         try {
 
-            movieDao.insertMovie(movie)
             val url = URL("${BuildConfig.IMAGE_URL}${movie.poster_path}")
             val connection = url.openConnection() as HttpURLConnection
             connection.connect()
