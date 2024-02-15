@@ -7,14 +7,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -32,31 +38,67 @@ import com.example.mvi_compose.movies.movies_list.Movie
 import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
 import com.example.mvi_compose.ui.CounterViewModel
 import com.example.mvi_compose.ui.theme.PurpleGrey40
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 @Composable
 fun MoviesScreen(viewModel: CounterViewModel, onMovieClick: (Movie) -> Unit) {
 
-    val moviesState = viewModel.state.collectAsState() // .collectAsStateWithLifecycle() // .value
+    val moviesState = viewModel.state.collectAsStateWithLifecycle().value // .collectAsStateWithLifecycle() // .value
+
     moviesState.let {
-        if (moviesState.value.loading) LoadingScreen()
-        else if( moviesState.value.error.isNotEmpty() )
-            ErrorScreen(error = moviesState.value.error)
-        else if ( moviesState.value.movies.isNotEmpty()) MoviesListScreen(movies = moviesState.value.movies, onMovieClick)
+        if (moviesState.loading) LoadingScreen()
+        else if( moviesState.error.isNotEmpty() )
+            ErrorScreen(error = moviesState.error)
+        else if ( moviesState.movies.isNotEmpty()) MoviesListScreen(movies = moviesState.movies, viewModel, onMovieClick)
     }
 }
 
+fun <T> stateSaver() = Saver<MutableState<T>, Any>(
+    save = { state -> state.value ?: "null" },
+    restore = { value ->
+        @Suppress("UNCHECKED_CAST")
+        mutableStateOf((if (value == "null") null else value) as T)
+    }
+)
+
 @Composable
-fun MoviesListScreen(movies: List<Movie>, onMovieClick: (Movie) -> Unit) {
-    val sortedContacts = rememberSaveable { mutableStateOf(movies) }
+fun MoviesListScreen(
+    movies: SnapshotStateList<Movie>,
+    viewModel: CounterViewModel,
+    onMovieClick: (Movie) -> Unit
+) {
+
+//    val sortedContacts = rememberSaveable { mutableStateOf(movies) }
+
+
+//    val moviesFlow = remember { MutableStateFlow<List<Movie>>(moviesState.movies) }
+//    val list = remember { mutableStateListOf<Movie>().apply { addAll(movies) } }
+
+    val newList = viewModel.state.collectAsState()
+
+//    val movies1 by moviesFlow.collectAsState()
+
+//    val sortedContacts = rememberSaveable { mutableStateOf(movies)<Movie>().apply {
+//        listOf(movies)
+//    } }
+
+//    val sortedContacts =   rememberSaveable(saver = stateSaver()) { mutableStateListOf<Movie>(movies) }
+
+//    val sortedContacts =  remember {
+//        mutableStateListOf<Movie>().apply { movies }
+//    }
+
+    val listState = rememberLazyListState()
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(
-            items = sortedContacts.value,
+            items = newList.value.movies.toList(), //  sortedContacts.value.value, // movies.value, // movies1, // list.toMutableList(), // movies, // sortedContacts.value,
             key = { movie ->
                 // Return a stable, unique key for the movie
                 movie.id
