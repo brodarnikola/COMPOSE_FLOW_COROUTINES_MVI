@@ -77,6 +77,8 @@ fun MoviesListScreen(
 
     val newList = viewModel.state.collectAsState()
 
+    val finalMovieList = remember { newList.value.movies }
+
 //    val movies1 by moviesFlow.collectAsState()
 
 //    val sortedContacts = rememberSaveable { mutableStateOf(movies)<Movie>().apply {
@@ -98,7 +100,7 @@ fun MoviesListScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(
-            items = newList.value.movies.toList(), //  sortedContacts.value.value, // movies.value, // movies1, // list.toMutableList(), // movies, // sortedContacts.value,
+            items = finalMovieList.toList() , // newList.value.movies.toList(), //  sortedContacts.value.value, // movies.value, // movies1, // list.toMutableList(), // movies, // sortedContacts.value,
             key = { movie ->
                 // Return a stable, unique key for the movie
                 movie.id
