@@ -1,9 +1,12 @@
 package com.example.mvi_compose
 
 
+import android.app.Activity
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -37,9 +40,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mvi_compose.ui.CounterViewModel
 import com.example.mvi_compose.ui.movies.MoviesScreen
@@ -62,18 +69,52 @@ fun TabView(tabBarItems: List<TabBarItem>, navController: NavController) {
         mutableStateOf(0)
     }
 
+    val context = LocalContext.current
+
+//    BackHandler  {
+//
+//        Log.d("MENU", "index is 22: $selectedTabIndex")
+//        if (selectedTabIndex != 0) {
+//            selectedTabIndex = 0
+//        } else {
+//            val activity = (context as? Activity)
+//            activity?.finish()
+//        }
+//    }
+
+    val backStackEntry = navController.currentBackStackEntryAsState()
+
     NavigationBar {
         // looping over each tab to generate the views and navigation for each item
         tabBarItems.forEachIndexed { index, tabBarItem ->
             NavigationBarItem(
-                selected = selectedTabIndex == index,
+                selected = tabBarItem.title == backStackEntry.value?.destination?.route, // selectedTabIndex == index,
                 onClick = {
                     selectedTabIndex = index
+                    Log.d("MENU", "index is: $index")
                     navController.navigate(tabBarItem.title)
+                    {
+                        launchSingleTop = true
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            Log.d("MENU", "index is 33: $index")
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+
+//                        popUpTo(route = tabBarItem.title) { inclusive = true }
+//                        restoreState = true
+
+                        // Pop up backstack to the first destination and save state. This makes going back
+                        // to the start destination when pressing back in any other bottom tab.
+                        // popUpTo(findStartDestination(navController.graph).id) { saveState = true }
+                    }
                 },
                 icon = {
                     TabBarIconView(
-                        isSelected = selectedTabIndex == index,
+                        isSelected = tabBarItem.title == backStackEntry.value?.destination?.route, // selectedTabIndex == index,
                         selectedIcon = tabBarItem.selectedIcon,
                         unselectedIcon = tabBarItem.unselectedIcon,
                         title = tabBarItem.title,
@@ -84,6 +125,12 @@ fun TabView(tabBarItems: List<TabBarItem>, navController: NavController) {
         }
     }
 }
+
+//@Composable
+//private fun currentRoute(navController: NavHostController): String? {
+//    val navBackStackEntry by navController.currentBackStackEntryAsState()
+//    return navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+//}
 
 // This component helps to clean up the API call from our TabView above,
 // but could just as easily be added inside the TabView without creating this custom component
@@ -143,7 +190,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
+
             MVI_ComposeTheme {
+
+
+//                BackHandler  {
+//
+//                    Log.d("MENU", "index is 55")
+//                }
+
                 // A surface container using the 'background' color from the theme
 
                 // setting up the individual tabs
@@ -167,7 +223,15 @@ class MainActivity : AppCompatActivity() {
                             NavHost(navController = navController, startDestination = homeTab.title) {
                                 composable(homeTab.title) {
                                     MoviesScreen(viewModel = viewModel, onMovieClick = {
-                                        Toast.makeText(this@MainActivity, "Clicked on movie", Toast.LENGTH_SHORT).show()
+                                        navController.navigate(moreTab.title)
+//                                        {
+//                                            launchSingleTop = true
+//                                            restoreState = true
+//                                            // Pop up backstack to the first destination and save state. This makes going back
+//                                            // to the start destination when pressing back in any other bottom tab.
+//                                            // popUpTo(findStartDestination(navController.graph).id) { saveState = true }
+//                                        }
+                                    // Toast.makeText(this@MainActivity, "Clicked on movie", Toast.LENGTH_SHORT).show()
                                     })
 //                                Text(homeTab.title)
                                 }
