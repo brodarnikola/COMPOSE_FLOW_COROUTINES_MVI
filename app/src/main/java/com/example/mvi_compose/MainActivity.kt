@@ -34,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -64,10 +66,10 @@ data class TabBarItem(
 // This is a wrapper view that allows us to easily and cleanly
 // reuse this component in any future project
 @Composable
-fun TabView(tabBarItems: List<TabBarItem>, navController: NavController) {
-    var selectedTabIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
+fun TabView(tabBarItems: List<TabBarItem>, navController: NavController, navBackStackEntry: State<NavBackStackEntry?>) {
+//    var selectedTabIndex by rememberSaveable {
+//        mutableStateOf(0)
+//    }
 
     val context = LocalContext.current
 
@@ -82,15 +84,15 @@ fun TabView(tabBarItems: List<TabBarItem>, navController: NavController) {
 //        }
 //    }
 
-    val backStackEntry = navController.currentBackStackEntryAsState()
+//    val backStackEntry = navController.currentBackStackEntryAsState()
 
     NavigationBar {
         // looping over each tab to generate the views and navigation for each item
         tabBarItems.forEachIndexed { index, tabBarItem ->
             NavigationBarItem(
-                selected = tabBarItem.title == backStackEntry.value?.destination?.route, // selectedTabIndex == index,
+                selected = tabBarItem.title == navBackStackEntry.value?.destination?.route, // selectedTabIndex == index,
                 onClick = {
-                    selectedTabIndex = index
+//                    selectedTabIndex = index
                     Log.d("MENU", "index is: $index")
                     navController.navigate(tabBarItem.title)
                     {
@@ -114,7 +116,7 @@ fun TabView(tabBarItems: List<TabBarItem>, navController: NavController) {
                 },
                 icon = {
                     TabBarIconView(
-                        isSelected = tabBarItem.title == backStackEntry.value?.destination?.route, // selectedTabIndex == index,
+                        isSelected = tabBarItem.title == navBackStackEntry.value?.destination?.route, // selectedTabIndex == index,
                         selectedIcon = tabBarItem.selectedIcon,
                         unselectedIcon = tabBarItem.unselectedIcon,
                         title = tabBarItem.title,
@@ -212,15 +214,28 @@ class MainActivity : AppCompatActivity() {
                 val tabBarItems = listOf(homeTab, alertsTab, settingsTab, moreTab)
                 val navController = rememberNavController()
 
+                val showBottomBar = rememberSaveable { mutableStateOf(true) }
+                val navBackStackEntry = navController.currentBackStackEntryAsState()
+
+                showBottomBar.value = when (navBackStackEntry.value?.destination?.route) {
+                    homeTab.title -> true // on this screen bottom bar should be hidden
+                    alertsTab.title -> false // here too
+                    else -> true // in all other cases show bottom bar
+                }
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    Scaffold(bottomBar = { TabView(tabBarItems, navController) }) {
+                    Scaffold(bottomBar = {
+                        if (showBottomBar.value) {
+                            TabView(tabBarItems, navController, navBackStackEntry)
+                        }
+                    }) {
                         paddingValues ->
-                        Column(modifier = Modifier.padding(paddingValues)) {
-                            NavHost(navController = navController, startDestination = homeTab.title) {
+//                        Column(modifier = Modifier.padding(paddingValues)) {
+                            NavHost(navController = navController, startDestination = homeTab.title, modifier = Modifier.padding(paddingValues)) {
                                 composable(homeTab.title) {
                                     MoviesScreen(viewModel = viewModel, onMovieClick = {
                                         navController.navigate(moreTab.title)
@@ -245,7 +260,7 @@ class MainActivity : AppCompatActivity() {
                                     MoreView()
                                 }
                             }
-                        }
+//                        }
                     }
                 }
             }
