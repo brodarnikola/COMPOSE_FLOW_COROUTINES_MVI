@@ -6,7 +6,7 @@ import retrofit2.Response
 
 interface IMovieRepo {
     suspend fun getPopularMovies(): NetworkResult<MoviesResponse>
-    suspend fun fetchMovieTrailers(movieId: Int): Response<TrailerResponse>
+    suspend fun fetchMovieTrailers(movieId: Int): NetworkResult<TrailerResponse>
     fun isMovieLiked(id: Int): Boolean
     fun changeLikeState(movie: Movie, newLikeState: Boolean)
 }

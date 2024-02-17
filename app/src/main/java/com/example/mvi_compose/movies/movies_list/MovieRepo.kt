@@ -40,8 +40,20 @@ class MovieRepo @Inject constructor(
 //        return movieApi.getMostPopular(BuildConfig.API_KEY)
     }
 
-    override suspend fun fetchMovieTrailers(movieId: Int): Response<TrailerResponse> {
-        return trailerApi.getMovieTrailer(movieId, BuildConfig.API_KEY)
+    override suspend fun fetchMovieTrailers(movieId: Int) : NetworkResult<TrailerResponse> = withContext(Dispatchers.IO) {
+
+        val networkResult = handleNetworkRequest {
+            Log.d(REST_API_CALL,"get movie trailers")
+            trailerApi.getMovieTrailer(movieId, BuildConfig.API_KEY)
+        }
+
+        if( networkResult is NetworkResult.Success ) {
+            Log.d(REST_API_CALL,"start popular moview response is")
+        }
+
+        return@withContext networkResult
+
+//        return trailerApi.getMovieTrailer(movieId, BuildConfig.API_KEY)
     }
 
     override fun isMovieLiked(id: Int): Boolean {

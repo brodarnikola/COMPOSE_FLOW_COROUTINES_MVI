@@ -1,12 +1,9 @@
 package com.example.mvi_compose
 
 
-import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -35,22 +32,24 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mvi_compose.ui.CounterViewModel
+import com.example.mvi_compose.ui.MovieDetailsViewModel
+import com.example.mvi_compose.ui.movies.MovieDetailsScreen
 import com.example.mvi_compose.ui.movies.MoviesScreen
 import com.example.mvi_compose.ui.theme.MVI_ComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -185,7 +184,8 @@ fun MoreView() {
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: CounterViewModel by viewModels()
+    private val moviesViewModel: CounterViewModel by viewModels()
+    private val movieDetailsViewModel: MovieDetailsViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -237,8 +237,12 @@ class MainActivity : AppCompatActivity() {
 //                        Column(modifier = Modifier.padding(paddingValues)) {
                             NavHost(navController = navController, startDestination = homeTab.title, modifier = Modifier.padding(paddingValues)) {
                                 composable(homeTab.title) {
-                                    MoviesScreen(viewModel = viewModel, onMovieClick = {
-                                        navController.navigate(moreTab.title)
+
+                                    val viewModel: CounterViewModel by viewModels()
+                                    MoviesScreen(
+                                        viewModel = viewModel,
+                                        onMovieClick = { movieId ->
+                                        navController.navigate("movieDetails/$movieId")
 //                                        {
 //                                            launchSingleTop = true
 //                                            restoreState = true
@@ -249,6 +253,15 @@ class MainActivity : AppCompatActivity() {
                                     // Toast.makeText(this@MainActivity, "Clicked on movie", Toast.LENGTH_SHORT).show()
                                     })
 //                                Text(homeTab.title)
+                                }
+                                composable("movieDetails/{movieId}",
+                                    arguments = listOf(navArgument("movieId") { type = NavType.LongType })
+                                ) { navBackStackEntry ->
+                                    Log.d("MOVIE_ID", "Movie id is 33: ${navBackStackEntry.arguments?.getLong("movieId") ?: 0L}")
+                                    MovieDetailsScreen(
+                                        viewModel = hiltViewModel(),
+                                        movieId = navBackStackEntry.arguments?.getLong("movieId") ?: 0L
+                                    )
                                 }
                                 composable(alertsTab.title) {
                                     Text(alertsTab.title)
