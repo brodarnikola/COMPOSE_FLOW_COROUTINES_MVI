@@ -76,27 +76,44 @@ class CounterViewModel @Inject constructor(
 
                 }
                 is NetworkResult.Success -> {
-                    _state.update { it.copy(loading = false, movies = result.data.results.toMutableStateList()) }  //, movies = result.data.results) }
-
+                    withContext(Dispatchers.Main) {
+                        _state.update {
+                            it.copy(
+                                loading = false,
+                                movies = result.data.results.toMutableStateList()
+                            )
+                        }  //, movies = result.data.results) }
+                    }
 //                    _state.value.movies.addAll( result.data.results ) // .toMutableList()
 
 //                    _state.value = _state.value.copy(movies = result.data.results.toMutableStateList())
 
-                    val listFetchImages = mutableListOf<Deferred<Unit>>()
-                    result.data.results.forEachIndexed { index, movie ->
-                            movieDao.insertMovie(movie)
-                            val movies = movieDao.fetchFavouriteMovies()
+                        val listFetchImages = mutableListOf<Deferred<Unit>>()
+                        result.data.results.forEachIndexed { index, movie ->
+                            withContext(Dispatchers.IO) {
+                                movieDao.insertMovie(movie)
+                                val movies = movieDao.fetchFavouriteMovies()
+                            }
 
                             listFetchImages.add(
                                 async {
-                                    val increment = if( index % 2 == 0 ) 3000 else 1500
+                                    val increment = if (index % 2 == 0) 3000 else 1500
                                     val random = Random.nextInt(500) + increment
-                                    Log.d(REST_API_CALL, "Random delay is START: ${random} .. ${ _state.value.movies[index]}")
+                                    Log.d(
+                                        REST_API_CALL,
+                                        "Random delay is START: ${random} .. ${_state.value.movies[index]}"
+                                    )
                                     delay(random.toLong())
-                                    val test9 = result.data.results.set(index, result.data.results[index].copy(random_delay = random.toLong()))
+                                    val test9 = result.data.results.set(
+                                        index,
+                                        result.data.results[index].copy(random_delay = random.toLong())
+                                    )
 //                                    result.data.results[index] = test9
 //                                    newList.add(test9)
-                                    Log.d(REST_API_CALL, "Random delay is FINISH: ${ _state.value.movies[index]}")
+                                    Log.d(
+                                        REST_API_CALL,
+                                        "Random delay is FINISH: ${_state.value.movies[index]}"
+                                    )
 //                                    withContext(Dispatchers.Main) {
 //                                        _state.update { it.copy(movies = result.data.results) }
 //                                        _state.value.movies = result.data.results
@@ -108,7 +125,10 @@ class CounterViewModel @Inject constructor(
 //                                        _state.value.movies.value[index].random_delay = random.toLong()
 //                                        _state.value.movies.value = result.data.results
 
-                                        _state.value.movies[index] = _state.value.movies[index].copy(random_delay = random.toLong())
+                                    withContext(Dispatchers.Main) {
+                                        _state.value.movies[index] =
+                                            _state.value.movies[index].copy(random_delay = random.toLong())
+                                    }
 
 //                                        _state.update {
 //                                            it.copy(movies = result.data.results)
@@ -119,8 +139,8 @@ class CounterViewModel @Inject constructor(
                                     // downloadImage(movie)
                                 }
                             )
-                    }
-                    listFetchImages.awaitAll()        //
+                        }
+                        listFetchImages.awaitAll()        //
 //                    _state.value.movies.value = mutableListOf() //  result.data.results
 //////
 //                    _state.value.movies.value = result.data.results// newList // result.data.results
@@ -131,7 +151,7 @@ class CounterViewModel @Inject constructor(
 //                        async { fetchDoc(2) }   // async returns a result for the second doc
 //                    )
 //                    deferreds.awaitAll()
-                }
+                    }
             }
         }
     }

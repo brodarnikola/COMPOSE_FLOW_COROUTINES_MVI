@@ -4,6 +4,7 @@ package com.example.mvi_compose
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -182,7 +183,7 @@ fun MoreView() {
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() { // AppCompatActivity() {
 
     private val moviesViewModel: CounterViewModel by viewModels()
     private val movieDetailsViewModel: MovieDetailsViewModel by viewModels()
@@ -240,7 +241,7 @@ class MainActivity : AppCompatActivity() {
 
                                     val viewModel: CounterViewModel by viewModels()
                                     MoviesScreen(
-                                        viewModel = viewModel,
+                                        viewModel = hiltViewModel(), // viewModel,
                                         onMovieClick = { movieId ->
                                         navController.navigate("movieDetails/$movieId")
 //                                        {
