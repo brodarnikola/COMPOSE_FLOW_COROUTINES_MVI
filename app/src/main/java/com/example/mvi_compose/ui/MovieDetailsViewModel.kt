@@ -38,6 +38,7 @@ class MovieDetailsViewModel @Inject constructor(
     init {
         movieId = savedStateHandle.get<Long>("movieId") ?: 0L
         onEvent(MovieDetailsEvents.FetchTrailers)
+        onEvent(MovieDetailsEvents.GetLikeState)
     }
 
     override fun initialState(): MovieDetailsState {
@@ -154,20 +155,26 @@ class MovieDetailsViewModel @Inject constructor(
 
     private fun updateLikeStatus() {
         viewModelScope.launch(Dispatchers.IO) {
-//            val newLikeState = repository.isMovieLiked(movie.id).not()
-//            repository.changeLikeState(movie, newLikeState)
-//            withContext(Dispatchers.Main) {
-////                updateState { it.copy(trailerExternalIntent = null, isLiked = newLikeState) }
-//            }
+//            val newLikeState = repository.isMovieLiked(movieId.toInt()).not()
+            val movieData = repository.getMovieById(movieId)
+            val newLikeState = if( movieData.isLiked == false ) true else false
+            Log.d("LIKE_STATUS", "new like variable status is 1:  $newLikeState")
+            repository.changeLikeState(movieData.id, newLikeState)
+            val movieData2 = repository.getMovieById(movieId)
+            Log.d("LIKE_STATUS", "new like variable status is 2:  ${movieData2.isLiked}")
+            withContext(Dispatchers.Main) {
+                _state.update { it.copy(isLiked = newLikeState) }
+//                updateState { it.copy(trailerExternalIntent = null, isLiked = newLikeState) }
+            }
         }
     }
 
     private fun getLikeState() {
         viewModelScope.launch(Dispatchers.IO) {
-//            val likeState = repository.isMovieLiked(movie.id)
-//            withContext(Dispatchers.Main) {
-////                updateState { it.copy(isLiked = likeState) }
-//            }
+            val movieData = repository.getMovieById(movieId)
+            withContext(Dispatchers.Main) {
+                _state.update { it.copy(isLiked = movieData.isLiked) }
+            }
         }
     }
 

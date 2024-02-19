@@ -9,6 +9,6 @@ interface IMovieRepo {
     suspend fun getMovieById(movieId: Long): Movie
     suspend fun getPopularMovies(): NetworkResult<MoviesResponse>
     suspend fun fetchMovieTrailers(movieId: Int): NetworkResult<TrailerResponse>
-    fun isMovieLiked(id: Int): Boolean
-    fun changeLikeState(movie: Movie, newLikeState: Boolean)
+//    fun isMovieLiked(id: Int): Boolean
+    suspend fun changeLikeState(movieId: Int, newLikeState: Boolean)
 }

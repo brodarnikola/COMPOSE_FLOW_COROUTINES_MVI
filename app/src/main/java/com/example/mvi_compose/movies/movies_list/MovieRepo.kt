@@ -60,13 +60,12 @@ class MovieRepo @Inject constructor(
 //        return trailerApi.getMovieTrailer(movieId, BuildConfig.API_KEY)
     }
 
-    override fun isMovieLiked(id: Int): Boolean {
-        return movieDao.fetchFavouriteMovies().contains(id)
-    }
+//    override fun isMovieLiked(id: Int): Boolean {
+//        return movieDao.fetchFavouriteMovies().contains(id)
+//    }
 
-    override fun changeLikeState(movie: Movie, newLikeState: Boolean) {
-        if (newLikeState) movieDao.insertMovie(movie)
-        else movieDao.removeMovie(movie)
+    override suspend fun changeLikeState(movieId: Int, newLikeState: Boolean) = withContext(Dispatchers.IO) {
+        movieDao.updateLikeStatus(movieId, newLikeState)
     }
 
     private suspend fun <T : Any> handleNetworkRequest(apiCall: suspend () -> Response<T>): NetworkResult<T> {

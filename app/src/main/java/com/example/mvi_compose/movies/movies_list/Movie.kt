@@ -34,6 +34,8 @@ data class Movie(
     val backdrop_path: String? = "null",
     @ColumnInfo(name = "adult")
     var adult: Boolean = false,
+    @ColumnInfo(name = "isLiked")
+    var isLiked: Boolean = false,
     @ColumnInfo(name = "overview")
     val overview: String?,
     @ColumnInfo(name = "release_date")

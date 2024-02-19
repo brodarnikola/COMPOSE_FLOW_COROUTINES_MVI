@@ -13,6 +13,9 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE id = :movieId")
     fun getMovieById(movieId: Long) : Movie
 
+    @Query("UPDATE movies set isLiked = :isLiked WHERE id = :movieId")
+    suspend fun updateLikeStatus(movieId: Int, isLiked: Boolean)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMovie(movie: Movie)
 

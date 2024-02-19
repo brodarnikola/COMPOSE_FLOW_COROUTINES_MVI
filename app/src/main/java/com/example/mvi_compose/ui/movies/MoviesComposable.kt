@@ -34,60 +34,29 @@ import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
 import com.example.mvi_compose.ui.CounterViewModel
 import com.example.mvi_compose.ui.theme.PurpleGrey40
 import com.example.mvi_compose.R
+import com.example.mvi_compose.ui.CounterState
 
 
 @Composable
 fun MoviesScreen(viewModel: CounterViewModel, onMovieClick: (id: Long) -> Unit) {
 
     Log.d("MOVIE_ID", "Movie id is 22: ${onMovieClick}")
-    val moviesState = viewModel.state.collectAsStateWithLifecycle().value // .collectAsStateWithLifecycle() // .value
+    val moviesState = viewModel.state.collectAsStateWithLifecycle().value
 
     moviesState.let {
         if (moviesState.loading) LoadingScreen()
         else if( moviesState.error.isNotEmpty() )
             ErrorScreen(error = moviesState.error)
-        else if ( moviesState.movies.isNotEmpty()) MoviesListScreen(movies = moviesState.movies, viewModel, onMovieClick)
+        else if ( moviesState.movies.isNotEmpty()) MoviesListScreen(moviesState = moviesState,  onMovieClick)
     }
 }
 
-fun <T> stateSaver() = Saver<MutableState<T>, Any>(
-    save = { state -> state.value ?: "null" },
-    restore = { value ->
-        @Suppress("UNCHECKED_CAST")
-        mutableStateOf((if (value == "null") null else value) as T)
-    }
-)
-
 @Composable
 fun MoviesListScreen(
-    movies: SnapshotStateList<Movie>,
-    viewModel: CounterViewModel,
+    moviesState: CounterState,
     onMovieClick: (id: Long) -> Unit
 ) {
-
-//    val sortedContacts = rememberSaveable { mutableStateOf(movies) }
-
-
-//    val moviesFlow = remember { MutableStateFlow<List<Movie>>(moviesState.movies) }
-//    val list = remember { mutableStateListOf<Movie>().apply { addAll(movies) } }
-
-    val newList = viewModel.state.collectAsState()
-
-    val finalMovieList = remember { newList.value.movies }
-
-    Log.d("MOVIE_ID", "Movie id is 100: ${onMovieClick}")
-
-//    val movies1 by moviesFlow.collectAsState()
-
-//    val sortedContacts = rememberSaveable { mutableStateOf(movies)<Movie>().apply {
-//        listOf(movies)
-//    } }
-
-//    val sortedContacts =   rememberSaveable(saver = stateSaver()) { mutableStateListOf<Movie>(movies) }
-
-//    val sortedContacts =  remember {
-//        mutableStateListOf<Movie>().apply { movies }
-//    }
+    val finalMovieList = remember { moviesState.movies }
 
     val listState = rememberLazyListState()
     LazyColumn(
@@ -98,31 +67,14 @@ fun MoviesListScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(
-            items = finalMovieList.toList() , // newList.value.movies.toList(), //  sortedContacts.value.value, // movies.value, // movies1, // list.toMutableList(), // movies, // sortedContacts.value,
+            items = finalMovieList.toList() ,
             key = { movie ->
                 // Return a stable, unique key for the movie
                 movie.id
             }
         ) { movie ->
-//            Log.d(REST_API_CALL, "movie image is: ${BuildConfig.IMAGE_URL}${movie.poster_path}")
-//            Row(
-//                Modifier
-//                    .fillParentMaxWidth()
-//                    .fillParentMaxHeight(.5f),
-//            ) {
-
             Log.d("MOVIE_ID", "Movie id is 99: ${onMovieClick}")
                 MovieItem(movie, onMovieClick)
-//                for ((index, item) in row.withIndex()) {
-//                    Box(
-//                        Modifier
-//                            .fillMaxWidth(1f / (rowSize - index))
-//                            .padding(1.dp)
-//                    ) {
-//                        MovieItem(item, onMovieClick)
-//                    }
-//                }
-//            }
         }
     }
 }
@@ -139,7 +91,6 @@ fun MovieItem(movie: Movie, onMovieClick: (id: Long) -> Unit) {
                 drawRect(color = backgroundColor)
             }
             .clickable(onClick = {
-
                 Log.d("MOVIE_ID", "Movie id is 11: ${movie.id}")
                 onMovieClick(movie.id.toLong())
             })
@@ -151,12 +102,6 @@ fun MovieItem(movie: Movie, onMovieClick: (id: Long) -> Unit) {
                 .size(100.dp)
         )
         Text(text = "Random delay: ${movie.random_delay}", modifier = Modifier.padding(10.dp) )
-//        Image(
-//            painter = rememberImagePainter(data = "${BuildConfig.IMAGE_URL}${movie.poster_path}"),
-//            contentScale = ContentScale.FillBounds,
-//            contentDescription = null,
-//            modifier = Modifier.fillMaxSize()
-//        )
     }
 }
 
