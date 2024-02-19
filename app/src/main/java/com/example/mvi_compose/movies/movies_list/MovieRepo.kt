@@ -25,6 +25,10 @@ class MovieRepo @Inject constructor(
     private val moshi: Moshi
 ) : IMovieRepo {
 
+    override suspend fun getMovieById(movieId: Long): Movie = withContext(Dispatchers.IO) {
+        return@withContext movieDao.getMovieById(movieId)
+    }
+
     override suspend fun getPopularMovies(): NetworkResult<MoviesResponse> = withContext(Dispatchers.IO) {
 
         val networkResult = handleNetworkRequest {

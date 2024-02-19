@@ -10,6 +10,9 @@ import com.example.mvi_compose.movies.movies_list.Movie
 @Dao
 interface MovieDao {
 
+    @Query("SELECT * FROM movies WHERE id = :movieId")
+    fun getMovieById(movieId: Long) : Movie
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMovie(movie: Movie)
 

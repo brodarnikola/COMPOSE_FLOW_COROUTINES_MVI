@@ -91,6 +91,7 @@ class MovieDetailsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 
             delay(2000)
+            val movie = repository.getMovieById(movieId = movieId)
 
                 Log.d("MOVIE_ID", "Movie id is 44: ${movieId.toInt()}")
                 when(val result = repository.fetchMovieTrailers(movieId.toInt())) {
@@ -110,7 +111,8 @@ class MovieDetailsViewModel @Inject constructor(
                                 it.copy(
                                     isLoading = false,
                                     trailerExternalIntent = null,
-                                    trailers = result.data.results
+                                    trailers = result.data.results,
+                                    movie = movie
                                 )
                             }
                         }
