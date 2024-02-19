@@ -123,20 +123,20 @@ fun ErrorScreen(error: String) {
 @Preview
 @Composable
 fun MoviesListPreview() {
-    val movie = Movie(
-        id = 1,
-        poster_path = "https://picsum.photos/seed/picsum/200/300\n",
-        title = "SpiderMan",
-        release_date = "2021-05-26",
-        vote_average = 8.7,
-        vote_count = 100,
-        original_language = "en",
-        original_title = "",
-        popularity = 88.5,
-        video = true,
-        overview = "Spiderman movies is about man turning into a spider which can fly and attack bad people falling them dead",
-        random_delay = 0L
-    )
+//    val movie = Movie(
+//        id = 1,
+//        poster_path = "https://picsum.photos/seed/picsum/200/300\n",
+//        title = "SpiderMan",
+//        release_date = "2021-05-26",
+//        vote_average = 8.7,
+//        vote_count = 100,
+//        original_language = "en",
+//        original_title = "",
+//        popularity = 88.5,
+//        video = true,
+//        overview = "Spiderman movies is about man turning into a spider which can fly and attack bad people falling them dead",
+//        random_delay = 0L
+//    )
 //    MVIComposeSampleTheme {
 //        MoviesListScreen(
 //            arrayListOf(

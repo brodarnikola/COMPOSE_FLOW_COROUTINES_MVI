@@ -72,11 +72,6 @@ fun TabView(
     navController: NavController,
     navBackStackEntry: State<NavBackStackEntry?>
 ) {
-//    var selectedTabIndex by rememberSaveable {
-//        mutableStateOf(0)
-//    }
-
-    val context = LocalContext.current
 
 //    BackHandler  {
 //

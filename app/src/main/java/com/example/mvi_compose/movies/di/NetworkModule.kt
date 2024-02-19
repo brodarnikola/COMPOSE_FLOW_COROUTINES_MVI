@@ -1,6 +1,5 @@
 package com.example.mvi_compose.movies.utils
 
-import androidx.annotation.Nullable
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.details.TrailerApi
 import com.example.mvi_compose.movies.movies_list.MovieApi
@@ -28,9 +27,6 @@ import javax.inject.Singleton
 class NetworkModule {
 
     @Provides
-    fun provideBaseUrl() = BuildConfig.BASE_URL
-
-    @Provides
     @Singleton
     fun provideOkHttpClient() = if (BuildConfig.DEBUG) {
         val loggingInterceptor = HttpLoggingInterceptor().also { it.setLevel(HttpLoggingInterceptor.Level.BODY) }
@@ -53,12 +49,11 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(
-        okHttpClient: OkHttpClient,
-        BASE_URL: String
+        okHttpClient: OkHttpClient
     ): Retrofit =
         Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(BASE_URL)
+            .baseUrl(AppConstants.BASE_URL)
             .client(okHttpClient)
             .build()
 
