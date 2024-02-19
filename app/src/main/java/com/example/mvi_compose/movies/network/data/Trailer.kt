@@ -1,4 +1,4 @@
-package com.example.mvi_compose.movies.details
+package com.example.mvi_compose.movies.network.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

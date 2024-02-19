@@ -2,7 +2,6 @@ package com.example.mvi_compose.ui.movies
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,26 +10,17 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
-import com.example.mvi_compose.movies.movies_list.Movie
-import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
+import com.example.mvi_compose.movies.network.data.Movie
 import com.example.mvi_compose.ui.CounterViewModel
 import com.example.mvi_compose.ui.theme.PurpleGrey40
 import com.example.mvi_compose.R

@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.movies_list.Movie
-import com.example.mvi_compose.movies.movies_list.MovieRepo
+import com.example.mvi_compose.movies.network.data.Movie
+import com.example.mvi_compose.movies.repositories.MovieRepoImpl
 import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
 import com.example.mvi_compose.movies.utils.MovieDao
@@ -24,7 +24,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 class CounterViewModel @Inject constructor(
-    private val movieRepo: MovieRepo,
+    private val movieRepo: MovieRepoImpl,
     private val movieDao: MovieDao
 ) : BaseViewModel<CounterState, CounterEvent>() {
 

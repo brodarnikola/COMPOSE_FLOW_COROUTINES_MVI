@@ -1,9 +1,13 @@
 package com.example.mvi_compose.movies.utils
 
-import com.example.mvi_compose.movies.details.TrailerApi
-import com.example.mvi_compose.movies.movies_list.IMovieRepo
-import com.example.mvi_compose.movies.movies_list.MovieApi
-import com.example.mvi_compose.movies.movies_list.MovieRepo
+import android.location.Geocoder
+import com.example.mvi_compose.movies.network.TrailerApi
+import com.example.mvi_compose.movies.repositories.MovieRepo
+import com.example.mvi_compose.movies.network.MovieApi
+import com.example.mvi_compose.movies.repositories.LocationRepo
+import com.example.mvi_compose.movies.repositories.LocationRepoImpl
+import com.example.mvi_compose.movies.repositories.MovieRepoImpl
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -22,7 +26,13 @@ class RepositoryModule {
         moviesApi: MovieApi,
         trailersApi: TrailerApi,
         moshi: Moshi
-    ): IMovieRepo {
-        return MovieRepo(movieDao, moviesApi, trailersApi, moshi)
+    ): MovieRepo {
+        return MovieRepoImpl(movieDao, moviesApi, trailersApi, moshi)
+    }
+
+    @Singleton
+    @Provides
+    fun provideLocationRepository(fusedLocationClient: FusedLocationProviderClient, geocoder: Geocoder,) : LocationRepo {
+        return LocationRepoImpl(fusedLocationClient, geocoder)
     }
 }

@@ -51,6 +51,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.mvi_compose.ui.CounterViewModel
 import com.example.mvi_compose.ui.MovieDetailsViewModel
+import com.example.mvi_compose.ui.github_location.GithubLocationScreen
 import com.example.mvi_compose.ui.movies.MovieDetailsScreen
 import com.example.mvi_compose.ui.movies.MoviesScreen
 import com.example.mvi_compose.ui.theme.MVI_ComposeTheme
@@ -277,7 +278,7 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
                                 Text(alertsTab.title)
                             }
                             composable(settingsTab.title) {
-                                Text(settingsTab.title)
+                               GithubLocationScreen(viewModel = hiltViewModel())
                             }
                             composable(moreTab.title) {
                                 MoreView()

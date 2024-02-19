@@ -1,10 +1,11 @@
-package com.example.mvi_compose.movies.movies_list
+package com.example.mvi_compose.movies.repositories
 
-import com.example.mvi_compose.movies.details.TrailerResponse
+import com.example.mvi_compose.movies.network.data.TrailerResponse
 import com.example.mvi_compose.movies.network.NetworkResult
-import retrofit2.Response
+import com.example.mvi_compose.movies.network.data.Movie
+import com.example.mvi_compose.movies.network.data.MoviesResponse
 
-interface IMovieRepo {
+interface MovieRepo {
 
     suspend fun getMovieById(movieId: Long): Movie
     suspend fun getPopularMovies(): NetworkResult<MoviesResponse>

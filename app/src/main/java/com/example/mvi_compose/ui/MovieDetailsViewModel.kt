@@ -2,33 +2,23 @@ package com.example.mvi_compose.ui
 
 import android.content.Intent
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.details.Trailer
-import com.example.mvi_compose.movies.movies_list.IMovieRepo
-import com.example.mvi_compose.movies.movies_list.Movie
+import com.example.mvi_compose.movies.network.data.Trailer
+import com.example.mvi_compose.movies.repositories.MovieRepo
+import com.example.mvi_compose.movies.network.data.Movie
 import com.example.mvi_compose.movies.network.NetworkResult
-import com.example.mvi_compose.movies.utils.AppConstants
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
-    private val repository: IMovieRepo,
+    private val repository: MovieRepo,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<MovieDetailsState, MovieDetailsEvents>() {
 

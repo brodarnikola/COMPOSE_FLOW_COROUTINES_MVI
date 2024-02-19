@@ -1,5 +1,6 @@
-package com.example.mvi_compose.movies.movies_list
+package com.example.mvi_compose.movies.network
 
+import com.example.mvi_compose.movies.network.data.MoviesResponse
 import com.example.mvi_compose.movies.utils.AppConstants.Companion.API_KEY_QUERY
 import retrofit2.Response
 import retrofit2.http.GET

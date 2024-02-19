@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.mvi_compose.movies.movies_list.Movie
+import com.example.mvi_compose.movies.network.data.Movie
 
 @Dao
 interface MovieDao {

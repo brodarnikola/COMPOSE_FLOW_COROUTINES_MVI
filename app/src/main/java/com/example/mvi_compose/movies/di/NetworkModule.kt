@@ -1,8 +1,8 @@
 package com.example.mvi_compose.movies.utils
 
 import com.example.mvi_compose.BuildConfig
-import com.example.mvi_compose.movies.details.TrailerApi
-import com.example.mvi_compose.movies.movies_list.MovieApi
+import com.example.mvi_compose.movies.network.TrailerApi
+import com.example.mvi_compose.movies.network.MovieApi
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.Moshi
