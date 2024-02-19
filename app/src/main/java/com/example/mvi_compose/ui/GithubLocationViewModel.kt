@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.movies.network.data.Trailer
 import com.example.mvi_compose.movies.repositories.MovieRepo
 import com.example.mvi_compose.movies.network.data.Movie
+import com.example.mvi_compose.movies.repositories.LocationRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GithubLocationViewModel @Inject constructor(
-    private val repository: MovieRepo
+    private val locationRepo: LocationRepo
 ) : BaseViewModel<GithubLocationState, GithubLocationEvents>() {
 
     init {
@@ -42,7 +43,7 @@ class GithubLocationViewModel @Inject constructor(
 //                    it.copy(count = it.count - 1)
 //                }
                 sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
-                getLikeState()
+//                getLikeState()
             }
 
             is GithubLocationEvents.UpdateLikeState -> {
@@ -50,8 +51,10 @@ class GithubLocationViewModel @Inject constructor(
 //                    it.copy(count = it.count - 1)
 //                }
                 sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
-                updateLikeStatus()
+//                updateLikeStatus()
             }
+
+            GithubLocationEvents.ShowLocationPermissionRequiredDialog -> TODO()
         }
     }
 
@@ -74,21 +77,22 @@ class GithubLocationViewModel @Inject constructor(
         }
     }
 
-    private fun updateLikeStatus() {
-        viewModelScope.launch(Dispatchers.IO) {
-        }
-    }
 
-    private fun getLikeState() {
-        viewModelScope.launch(Dispatchers.IO) {
-
+    fun onPermissionResult(
+        permission: String,
+        isGranted: Boolean
+    ) {
+        if (!isGranted) {
+            sendUiEvent(event = GithubLocationEvents.ShowLocationPermissionRequiredDialog)
         }
     }
 
 }
 
 
-sealed class GithubLocationEvents {
+sealed class GithubLocationEvents : UiEffect {
+
+    object ShowLocationPermissionRequiredDialog: GithubLocationEvents()
     object FetchTrailers : GithubLocationEvents()
     object GetLikeState : GithubLocationEvents()
     object UpdateLikeState : GithubLocationEvents()

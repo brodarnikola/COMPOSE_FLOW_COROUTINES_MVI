@@ -1,9 +1,13 @@
 package com.example.mvi_compose.ui.github_location
 
+import android.Manifest
+import android.app.Activity
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,7 +24,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -39,8 +47,13 @@ import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.R
 import com.example.mvi_compose.movies.network.data.Trailer
 import com.example.mvi_compose.movies.utils.AppConstants
+import com.example.mvi_compose.ui.GithubLocationEvents
 import com.example.mvi_compose.ui.GithubLocationViewModel
 import com.example.mvi_compose.ui.MovieDetailsState
+import com.example.mvi_compose.ui.UiEffect
+import com.example.mvi_compose.ui.dialogs.ConfirmOrCancelDialog
+import com.example.mvi_compose.ui.extensions.getActivity
+import com.example.mvi_compose.ui.extensions.openAppSettings
 import com.example.mvi_compose.ui.movies.LoadingScreen
 
 @Composable
@@ -48,7 +61,58 @@ fun GithubLocationScreen(
     viewModel: GithubLocationViewModel
 ) {
 
+    val isDisplayedPermissionDialog = rememberSaveable { mutableStateOf(false) }
+
     val context = LocalContext.current
+    val coarseLocationPermissionResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            viewModel.onPermissionResult(
+                permission = Manifest.permission.ACCESS_COARSE_LOCATION,
+                isGranted = isGranted
+            )
+            if (isGranted) {
+                isDisplayedPermissionDialog.value = false
+            }
+        }
+    )
+    SideEffect {
+        coarseLocationPermissionResultLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+    }
+
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.uiEffect.collect { event ->
+            when (event) {
+                is UiEffect.ShowToast -> {
+                    Toast.makeText(context, event.message, event.toastLength).show()
+                }
+                is GithubLocationEvents.ShowLocationPermissionRequiredDialog -> {
+                    isDisplayedPermissionDialog.value = true
+                }
+            }
+        }
+    }
+
+    if (isDisplayedPermissionDialog.value) {
+        ConfirmOrCancelDialog(
+            titleText = "Permission required",
+            descriptionText = "This app requires access to your location in order to display your position",
+            confirmText = "Grant permission",
+            onConfirmOrCancel = {
+                if (it) {
+//                    (context.getActivity() as MainActivity).openAppSettings()
+//                    val activity = (context as? Activity)
+//                    activity.openAppSettings()
+                    context.getActivity()?.openAppSettings()
+                } else {
+                    Toast.makeText(context, "Please enable permission to continue", Toast.LENGTH_SHORT).show()
+//                    upPress()
+                }
+            }
+        )
+    }
+
     val githubLocation = viewModel.state.collectAsStateWithLifecycle().value
 
     githubLocation.let {
@@ -66,15 +130,6 @@ fun GithubLocationScreen(
 //            }
         }
     }
-}
-
-fun openMovieTrailer(trailerKey: String, context: Context) {
-    val intent = try {
-        Intent(Intent.ACTION_VIEW, Uri.parse("${AppConstants.YOUTUBE_APP_URI}$trailerKey"))
-    } catch (ex: ActivityNotFoundException) {
-        Intent(Intent.ACTION_VIEW, Uri.parse("${AppConstants.YOUTUBE_WEB_URI}$trailerKey"))
-    }
-    context.startActivity(intent)
 }
 
 @Composable
