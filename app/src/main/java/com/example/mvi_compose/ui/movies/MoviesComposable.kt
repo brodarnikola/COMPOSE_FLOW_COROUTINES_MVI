@@ -1,6 +1,7 @@
 package com.example.mvi_compose.ui.movies
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.movies_list.Movie
 import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
@@ -142,8 +144,8 @@ fun MovieItem(movie: Movie, onMovieClick: (id: Long) -> Unit) {
                 onMovieClick(movie.id.toLong())
             })
     ) {
-        AsyncImage(
-            model = "${BuildConfig.IMAGE_URL}${movie.poster_path}",
+        Image(
+            painter = rememberAsyncImagePainter(model = "${BuildConfig.IMAGE_URL}${movie.poster_path}"),
             contentDescription = "Awesome image_${movie.id}",
             modifier = Modifier
                 .size(100.dp)

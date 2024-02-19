@@ -8,20 +8,27 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.details.Trailer
@@ -32,59 +39,71 @@ import com.example.mvi_compose.ui.MovieDetailsState
 @Composable
 fun MovieDetailsScreen(
     viewModel: MovieDetailsViewModel,
-    movieId: Long,
+    navigateUp: () -> Unit,
 //    onFavClicked: () -> Unit,
 //    onTrailerClick: (String) -> Unit
 ) {
 
-    Log.d("MOVIE_ID", "Movie id is 55: ${movieId}")
     val detailsState = viewModel.state.collectAsStateWithLifecycle().value
 
     detailsState.let {
         if (detailsState.isLoading) LoadingScreen()
 //        else if( moviesState.error.isNotEmpty() )
 //            ErrorScreen(error = moviesState.error)
-        else if (detailsState.trailers?.isNotEmpty() == true) MovieDetailsDataScreen(detailsState) //(movies = detailsState.trailers, viewModel)
+        else if (detailsState.trailers?.isNotEmpty() == true) MovieDetailsDataScreen(detailsState, navigateUp = navigateUp) //(movies = detailsState.trailers, viewModel)
     }
 }
 
 @Composable
-fun MovieDetailsDataScreen(detailsState: MovieDetailsState) {  //(movies: List<Trailer>, viewModel: MovieDetailsViewModel) {
+fun MovieDetailsDataScreen(detailsState: MovieDetailsState, navigateUp: () -> Unit) {  //(movies: List<Trailer>, viewModel: MovieDetailsViewModel) {
 
-//    val movieDetails = viewModel.state.collectAsStateWithLifecycle()
-//    with(detailsState) {
-//        ConstraintLayout(
-//            androidx.compose.ui.Modifier
-//                .fillMaxHeight()
-//                .fillMaxWidth()
-//                .padding(20.dp)
-//        ) {
-    Column(
-        androidx.compose.ui.Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .padding(20.dp)
-    ) {
 
-//            val logo = createRef()
-//            val title = createRef()
-//            val release = createRef()
-//            val votes = createRef()
-//            val rate = createRef()
-//            val ratingBar = createRef()
-//            val likeIcon = createRef()
-//            val plot = createRef()
-//            val trailersList = createRef()
+        ConstraintLayout(
+            Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+
+            val arrowBack = createRef()
+            val logo = createRef()
+            val title = createRef()
+            val release = createRef()
+            val votes = createRef()
+            val rate = createRef()
+            val ratingBar = createRef()
+            val likeIcon = createRef()
+            val plot = createRef()
+            val trailersList = createRef()
+
+            val backgroundColor = colorResource(id = R.color.teal_700)
+            Image(
+                painter = painterResource(id = R.drawable.ic_m3_back_arrow),
+                contentDescription = stringResource(id = R.string.app_name),
+                modifier = Modifier
+                    .constrainAs(arrowBack) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                    }
+                    .drawBehind {
+                        drawCircle(backgroundColor)
+                    }
+                    .size(40.dp)
+                    .clickable {
+                        navigateUp()
+                    }
+            )
 
             Image(
-                painter = rememberImagePainter("${BuildConfig.IMAGE_URL}${detailsState.movie?.poster_path}"),
-                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds,
+                painter = rememberAsyncImagePainter("${BuildConfig.IMAGE_URL}${detailsState.movie?.poster_path}"),
+                contentScale =  ContentScale.FillBounds,
                 contentDescription = null,
-                modifier = androidx.compose.ui.Modifier
-//                    .constrainAs(logo) {
-//                        start.linkTo(parent.start)
+                modifier = Modifier
+                    .constrainAs(logo) {
+                        start.linkTo(parent.start)
+                        top.linkTo(arrowBack.bottom, margin = 10.dp)
 //                        top.linkTo(parent.top)
-//                    }
+                    }
                     .width(160.dp)
                     .height(135.dp)
                     .padding(end = 10.dp)
@@ -92,76 +111,62 @@ fun MovieDetailsDataScreen(detailsState: MovieDetailsState) {  //(movies: List<T
 
             detailsState.movie?.title?.let {
                 Text(
-//                    modifier = androidx.compose.ui.Modifier
-//                        .constrainAs(title) {
-//                            start.linkTo(logo.end)
+                    modifier =  Modifier
+                        .constrainAs(title) {
+                            start.linkTo(logo.end)
+                            top.linkTo(arrowBack.bottom, margin = 10.dp)
 //                            top.linkTo(logo.top)
-//                        },
+                        },
                     text = it,
                     fontSize = 18.sp,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                    color = androidx.compose.ui.graphics.Color.Black
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
             }
 
             Text(
-                modifier = androidx.compose.ui.Modifier
-//                    .constrainAs(release) {
-//                        start.linkTo(logo.end)
-//                        top.linkTo(title.bottom)
-//                    }
+                modifier = Modifier
+                    .constrainAs(release) {
+                        start.linkTo(logo.end)
+                        top.linkTo(title.bottom)
+                    }
                     .padding(top = 4.dp),
                 fontSize = 14.sp,
                 text = "Released in : ${detailsState.movie?.release_date}",
-                color =  androidx.compose.ui.graphics.Color.LightGray
+                color =  Color.LightGray
             )
 
             Text(
-                modifier = androidx.compose.ui.Modifier
-//                    .constrainAs(votes) {
-//                        start.linkTo(logo.end)
-//                        top.linkTo(release.bottom)
-//                    }
+                modifier = Modifier
+                    .constrainAs(votes) {
+                        start.linkTo(logo.end)
+                        top.linkTo(release.bottom)
+                    }
                     .padding(top = 4.dp),
                 fontSize = 14.sp,
                 text = "Votes : ${detailsState.movie?.vote_count}",
-                color =  androidx.compose.ui.graphics.Color.LightGray
+                color =  Color.LightGray
 
             )
 
             Text(
-                modifier = androidx.compose.ui.Modifier
-//                    .constrainAs(rate) {
-//                        start.linkTo(logo.end)
-//                        top.linkTo(votes.bottom)
-//                    }
+                modifier = Modifier
+                    .constrainAs(rate) {
+                        start.linkTo(logo.end)
+                        top.linkTo(votes.bottom)
+                    }
                     .padding(top = 6.dp),
                 fontSize = 16.sp,
                 text = "${detailsState.movie?.vote_average}",
-                color =  androidx.compose.ui.graphics.Color.LightGray
+                color =  Color.LightGray
             )
 
-//            (movie?.vote_average?.div(2))?.toFloat()?.let {
-//                RatingBar(
-//                    modifier = Modifier
-//                        .constrainAs(ratingBar) {
-//                            start.linkTo(rate.end)
-//                            top.linkTo(votes.bottom)
-//                        }
-//                        .padding(start = 4.dp, top = 4.dp),
-//                    value = it,
-//                    ratingBarStyle = RatingBarStyle.Normal,
-//                    onRatingChanged = {},
-//                    onValueChange = {},
-//                )
-//            }
-
             Image(
-                modifier = androidx.compose.ui.Modifier
-//                    .constrainAs(likeIcon) {
-//                        start.linkTo(logo.end)
-//                        bottom.linkTo(logo.bottom)
-//                    }
+                modifier = Modifier
+                    .constrainAs(likeIcon) {
+                        start.linkTo(rate.end, margin = 10.dp)
+                        top.linkTo(votes.bottom)
+                    }
                     .size(30.dp)
                     .padding(top = 4.dp)
                     .clickable(
@@ -178,31 +183,28 @@ fun MovieDetailsDataScreen(detailsState: MovieDetailsState) {  //(movies: List<T
 
             detailsState.movie?.overview?.let {
                 Text(
-                    modifier = androidx.compose.ui.Modifier
-//                        .constrainAs(plot) {
-//                            start.linkTo(parent.start)
-//                            top.linkTo(logo.bottom)
-//                        }
+                    modifier = Modifier
+                        .constrainAs(plot) {
+                            start.linkTo(parent.start)
+                            top.linkTo(logo.bottom)
+                        }
                         .padding(top = 16.dp),
                     text = it,
-                    color = androidx.compose.ui.graphics.Color.Black
+                    color = Color.Black
                 )
             }
 
             Box(
                 modifier = Modifier
-//                    .constrainAs(trailersList) {
-//                        start.linkTo(parent.start)
-//                        top.linkTo(plot.bottom)
-//                    }
+                    .constrainAs(trailersList) {
+                        start.linkTo(parent.start)
+                        top.linkTo(plot.bottom)
+                        bottom.linkTo(parent.bottom)
+                        height = Dimension.fillToConstraints
+                    }
                     .padding(top = 16.dp)
                     .fillMaxWidth()
                     .fillMaxHeight()) {
-//                if (isLoading) LoadingScreen()
-//                errorMessage?.let {
-//                    ErrorScreen(error = it)
-//                    return@Box
-//                }
                 if (detailsState.trailers?.isNotEmpty() == true)
                     TrailerList(detailsState.trailers, /*onTrailerClick*/)
             }

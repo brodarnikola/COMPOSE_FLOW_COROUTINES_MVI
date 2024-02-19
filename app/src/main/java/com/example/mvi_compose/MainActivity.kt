@@ -67,7 +67,11 @@ data class TabBarItem(
 // This is a wrapper view that allows us to easily and cleanly
 // reuse this component in any future project
 @Composable
-fun TabView(tabBarItems: List<TabBarItem>, navController: NavController, navBackStackEntry: State<NavBackStackEntry?>) {
+fun TabView(
+    tabBarItems: List<TabBarItem>,
+    navController: NavController,
+    navBackStackEntry: State<NavBackStackEntry?>
+) {
 //    var selectedTabIndex by rememberSaveable {
 //        mutableStateOf(0)
 //    }
@@ -124,7 +128,7 @@ fun TabView(tabBarItems: List<TabBarItem>, navController: NavController, navBack
                         badgeAmount = tabBarItem.badgeAmount
                     )
                 },
-                label = {Text(tabBarItem.title)})
+                label = { Text(tabBarItem.title) })
         }
     }
 }
@@ -148,7 +152,11 @@ fun TabBarIconView(
 ) {
     BadgedBox(badge = { TabBarBadgeView(badgeAmount) }) {
         Icon(
-            imageVector = if (isSelected) {selectedIcon} else {unselectedIcon},
+            imageVector = if (isSelected) {
+                selectedIcon
+            } else {
+                unselectedIcon
+            },
             contentDescription = title
         )
     }
@@ -186,8 +194,8 @@ fun MoreView() {
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() { // AppCompatActivity() {
 
-    private val moviesViewModel: CounterViewModel by viewModels()
-    private val movieDetailsViewModel: MovieDetailsViewModel by viewModels()
+//    private val moviesViewModel: CounterViewModel by viewModels()
+//    private val movieDetailsViewModel: MovieDetailsViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -195,20 +203,31 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-
             MVI_ComposeTheme {
-
-//
-//                    Log.d("MENU", "index is 55")
-//                }
-
                 // A surface container using the 'background' color from the theme
 
                 // setting up the individual tabs
-                val homeTab = TabBarItem(title = "Home", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home)
-                val alertsTab = TabBarItem(title = "Alerts", selectedIcon = Icons.Filled.Email, unselectedIcon = Icons.Outlined.Email, badgeAmount = 7)
-                val settingsTab = TabBarItem(title = "Settings", selectedIcon = Icons.Filled.Settings, unselectedIcon = Icons.Outlined.Settings)
-                val moreTab = TabBarItem(title = "More", selectedIcon = Icons.Filled.Person, unselectedIcon = Icons.Outlined.Person)
+                val homeTab = TabBarItem(
+                    title = "Home",
+                    selectedIcon = Icons.Filled.Home,
+                    unselectedIcon = Icons.Outlined.Home
+                )
+                val alertsTab = TabBarItem(
+                    title = "Alerts",
+                    selectedIcon = Icons.Filled.Email,
+                    unselectedIcon = Icons.Outlined.Email,
+                    badgeAmount = 7
+                )
+                val settingsTab = TabBarItem(
+                    title = "Settings",
+                    selectedIcon = Icons.Filled.Settings,
+                    unselectedIcon = Icons.Outlined.Settings
+                )
+                val moreTab = TabBarItem(
+                    title = "More",
+                    selectedIcon = Icons.Filled.Person,
+                    unselectedIcon = Icons.Outlined.Person
+                )
 
                 // creating a list of all the tabs
                 val tabBarItems = listOf(homeTab, alertsTab, settingsTab, moreTab)
@@ -217,10 +236,9 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
                 val showBottomBar = rememberSaveable { mutableStateOf(true) }
                 val navBackStackEntry = navController.currentBackStackEntryAsState()
 
-                showBottomBar.value = when (navBackStackEntry.value?.destination?.route) {
-                    homeTab.title -> true // on this screen bottom bar should be hidden
-                    alertsTab.title -> false // here too
-                    else -> true // in all other cases show bottom bar
+                showBottomBar.value = when {
+                    navBackStackEntry.value?.destination?.route?.contains("movieDetails") == true -> false
+                    else -> true
                 }
 
                 Surface(
@@ -232,61 +250,44 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
                         if (showBottomBar.value) {
                             TabView(tabBarItems, navController, navBackStackEntry)
                         }
-                    }) {
-                        paddingValues ->
-//                        Column(modifier = Modifier.padding(paddingValues)) {
-                            NavHost(navController = navController, startDestination = homeTab.title, modifier = Modifier.padding(paddingValues)) {
-                                composable(homeTab.title) {
-
-                                    val viewModel: CounterViewModel by viewModels()
-                                    MoviesScreen(
-                                        viewModel = hiltViewModel(), // viewModel,
-                                        onMovieClick = { movieId ->
-                                            if( navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED ) {
-                                                navController.navigate("movieDetails/$movieId")
-                                                {
-                                                    launchSingleTop = true
-//                                            popUpTo(navController.graph.findStartDestination().id) {
-//                                                Log.d("MENU", "index is 33: $index")
-//                                                saveState = true
-//                                            }
-                                                    // Avoid multiple copies of the same destination when
-                                                    // reselecting the same item
-                                                    // Restore state when reselecting a previously selected item
-                                                    restoreState = false
-                                                }
-//                                        {
-//                                            launchSingleTop = true
-//                                            restoreState = true
-//                                            // Pop up backstack to the first destination and save state. This makes going back
-//                                            // to the start destination when pressing back in any other bottom tab.
-//                                            // popUpTo(findStartDestination(navController.graph).id) { saveState = true }
-//                                        }
-                                                // Toast.makeText(this@MainActivity, "Clicked on movie", Toast.LENGTH_SHORT).show()
-                                            }
+                    }) { paddingValues ->
+                        NavHost(
+                            navController = navController,
+                            startDestination = homeTab.title,
+                            modifier = Modifier.padding(paddingValues)
+                        ) {
+                            composable(homeTab.title) {
+                                MoviesScreen(
+                                    viewModel = hiltViewModel(), // viewModel,
+                                    onMovieClick = { movieId ->
+                                        if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                                            navController.navigate("movieDetails/$movieId")
+                                        }
                                     })
-//                                Text(homeTab.title)
-                                }
-                                composable("movieDetails/{movieId}",
-                                    arguments = listOf(navArgument("movieId") { type = NavType.LongType })
-                                ) { navBackStackEntry ->
-                                    Log.d("MOVIE_ID", "Movie id is 33: ${navBackStackEntry.arguments?.getLong("movieId") ?: 0L}")
-                                    MovieDetailsScreen(
-                                        viewModel = hiltViewModel(),
-                                        movieId = navBackStackEntry.arguments?.getLong("movieId") ?: 0L
-                                    )
-                                }
-                                composable(alertsTab.title) {
-                                    Text(alertsTab.title)
-                                }
-                                composable(settingsTab.title) {
-                                    Text(settingsTab.title)
-                                }
-                                composable(moreTab.title) {
-                                    MoreView()
-                                }
                             }
-//                        }
+                            composable(
+                                "movieDetails/{movieId}",
+                                arguments = listOf(navArgument("movieId") {
+                                    type = NavType.LongType
+                                })
+                            ) { navBackStackEntry ->
+                                MovieDetailsScreen(
+                                    viewModel = hiltViewModel(),
+                                    navigateUp = {
+                                        navController.navigateUp()
+                                    }
+                                )
+                            }
+                            composable(alertsTab.title) {
+                                Text(alertsTab.title)
+                            }
+                            composable(settingsTab.title) {
+                                Text(settingsTab.title)
+                            }
+                            composable(moreTab.title) {
+                                MoreView()
+                            }
+                        }
                     }
                 }
             }

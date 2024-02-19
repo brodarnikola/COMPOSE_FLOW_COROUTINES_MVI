@@ -36,8 +36,8 @@ class MovieDetailsViewModel @Inject constructor(
     private var movieId: Long = 0L // checkNotNull(savedStateHandle["id"])
 
     init {
-         movieId = savedStateHandle.get<Long>("movieId") ?: 0L
-         onEvent(MovieDetailsEvents.FetchTrailers)
+        movieId = savedStateHandle.get<Long>("movieId") ?: 0L
+        onEvent(MovieDetailsEvents.FetchTrailers)
     }
 
     override fun initialState(): MovieDetailsState {
@@ -45,7 +45,7 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     override fun onEvent(event: MovieDetailsEvents) {
-        when(event) {
+        when (event) {
             is MovieDetailsEvents.FetchTrailers -> {
 //                _state.update {
 //                    it.copy(count = it.count + 1)
@@ -53,18 +53,20 @@ class MovieDetailsViewModel @Inject constructor(
                 sendUiEvent(UiEffect.ShowToast(message = "Incremented by one"))
                 fetchMovieTrailers()
             }
+
             is MovieDetailsEvents.GetLikeState -> {
 //                _state.update {
 //                    it.copy(count = it.count - 1)
 //                }
-                sendUiEvent( UiEffect.ShowToast(message = "Decremented by one"))
+                sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
                 getLikeState()
             }
+
             is MovieDetailsEvents.UpdateLikeState -> {
 //                _state.update {
 //                    it.copy(count = it.count - 1)
 //                }
-                sendUiEvent( UiEffect.ShowToast(message = "Decremented by one"))
+                sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
                 updateLikeStatus()
             }
         }
@@ -84,24 +86,26 @@ class MovieDetailsViewModel @Inject constructor(
 //    }
 
     private fun fetchMovieTrailers() {
-        try {
-            _state.update {
-                it.copy(isLoading = true)
-            }
-        viewModelScope.launch(Dispatchers.IO) {
 
-            delay(2000)
-            val movie = repository.getMovieById(movieId = movieId)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _state.update {
+                    it.copy(isLoading = true)
+                }
+                delay(2000)
+                val movie = repository.getMovieById(movieId = movieId)
 
                 Log.d("MOVIE_ID", "Movie id is 44: ${movieId.toInt()}")
-                when(val result = repository.fetchMovieTrailers(movieId.toInt())) {
+                when (val result = repository.fetchMovieTrailers(movieId.toInt())) {
 
                     is NetworkResult.Error -> {
 
                     }
+
                     is NetworkResult.Exception -> {
 
                     }
+
                     is NetworkResult.Success -> {
 
                         Log.d("MOVIE_ID", "Movie id is 55: ${result}")
@@ -118,6 +122,13 @@ class MovieDetailsViewModel @Inject constructor(
                         }
                     }
                 }
+
+            } catch (e: Exception) {
+                Log.d("MOVIE_ID", "Movie id is 101: ${e.localizedMessage}")
+                _state.update {
+                    it.copy(isLoading = false, errorMessage = e.message)
+                }
+            }
 
 
 //                val results = repository.fetchMovieTrailers(movieId) //  .body()?.results
@@ -138,12 +149,6 @@ class MovieDetailsViewModel @Inject constructor(
 //                _state.update {
 //                    it.copy(isLoading = false)
 //                }
-            }
-        } catch (e: Exception) {
-            Log.d("MOVIE_ID", "Movie id is 101: ${e.localizedMessage}")
-            _state.update {
-                it.copy(isLoading = false, errorMessage = e.message )
-            }
         }
     }
 
@@ -187,6 +192,6 @@ data class MovieDetailsState(
     val isLoading: Boolean = false,
     val trailers: List<Trailer>? = null,
     val isLiked: Boolean = false,
-    val trailerExternalIntent : Intent? = null,
+    val trailerExternalIntent: Intent? = null,
     val errorMessage: String? = null
 )
