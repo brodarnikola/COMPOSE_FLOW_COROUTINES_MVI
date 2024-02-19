@@ -79,7 +79,7 @@ annotation class SerializeNulls() {
     companion object {
         val JSON_ADAPTER_FACTORY: JsonAdapter.Factory =
             object : JsonAdapter.Factory {
-                @Nullable
+//                @Nullable
                 override fun create(
                     type: Type,
                     annotations: Set<Annotation>,

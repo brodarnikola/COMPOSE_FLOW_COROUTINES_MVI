@@ -73,6 +73,8 @@ fun MoviesListScreen(
 
     val finalMovieList = remember { newList.value.movies }
 
+    Log.d("MOVIE_ID", "Movie id is 100: ${onMovieClick}")
+
 //    val movies1 by moviesFlow.collectAsState()
 
 //    val sortedContacts = rememberSaveable { mutableStateOf(movies)<Movie>().apply {
@@ -106,6 +108,8 @@ fun MoviesListScreen(
 //                    .fillParentMaxWidth()
 //                    .fillParentMaxHeight(.5f),
 //            ) {
+
+            Log.d("MOVIE_ID", "Movie id is 99: ${onMovieClick}")
                 MovieItem(movie, onMovieClick)
 //                for ((index, item) in row.withIndex()) {
 //                    Box(

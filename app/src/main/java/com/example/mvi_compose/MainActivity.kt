@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -197,8 +198,6 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
 
             MVI_ComposeTheme {
 
-
-//                BackHandler  {
 //
 //                    Log.d("MENU", "index is 55")
 //                }
@@ -243,7 +242,19 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
                                     MoviesScreen(
                                         viewModel = hiltViewModel(), // viewModel,
                                         onMovieClick = { movieId ->
-                                        navController.navigate("movieDetails/$movieId")
+                                            if( navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED ) {
+                                                navController.navigate("movieDetails/$movieId")
+                                                {
+                                                    launchSingleTop = true
+//                                            popUpTo(navController.graph.findStartDestination().id) {
+//                                                Log.d("MENU", "index is 33: $index")
+//                                                saveState = true
+//                                            }
+                                                    // Avoid multiple copies of the same destination when
+                                                    // reselecting the same item
+                                                    // Restore state when reselecting a previously selected item
+                                                    restoreState = false
+                                                }
 //                                        {
 //                                            launchSingleTop = true
 //                                            restoreState = true
@@ -251,7 +262,8 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
 //                                            // to the start destination when pressing back in any other bottom tab.
 //                                            // popUpTo(findStartDestination(navController.graph).id) { saveState = true }
 //                                        }
-                                    // Toast.makeText(this@MainActivity, "Clicked on movie", Toast.LENGTH_SHORT).show()
+                                                // Toast.makeText(this@MainActivity, "Clicked on movie", Toast.LENGTH_SHORT).show()
+                                            }
                                     })
 //                                Text(homeTab.title)
                                 }

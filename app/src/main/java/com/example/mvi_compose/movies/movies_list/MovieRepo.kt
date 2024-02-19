@@ -48,7 +48,7 @@ class MovieRepo @Inject constructor(
         }
 
         if( networkResult is NetworkResult.Success ) {
-            Log.d(REST_API_CALL,"start popular moview response is")
+            Log.d(REST_API_CALL,"get movie trailers is 2")
         }
 
         return@withContext networkResult

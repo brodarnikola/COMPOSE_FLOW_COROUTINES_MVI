@@ -84,11 +84,13 @@ class MovieDetailsViewModel @Inject constructor(
 //    }
 
     private fun fetchMovieTrailers() {
+        try {
+            _state.update {
+                it.copy(isLoading = true)
+            }
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _state.update {
-                    it.copy(isLoading = true)
-                }
+
+            delay(2000)
 
                 Log.d("MOVIE_ID", "Movie id is 44: ${movieId.toInt()}")
                 when(val result = repository.fetchMovieTrailers(movieId.toInt())) {
@@ -103,12 +105,14 @@ class MovieDetailsViewModel @Inject constructor(
 
                         Log.d("MOVIE_ID", "Movie id is 55: ${result}")
                         Log.d("MOVIE_ID", "Movie id is 66: ${result.data.results}")
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                trailerExternalIntent = null,
-                                trailers = result.data.results
-                            )
+                        withContext(Dispatchers.Main) {
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    trailerExternalIntent = null,
+                                    trailers = result.data.results
+                                )
+                            }
                         }
                     }
                 }
@@ -132,10 +136,11 @@ class MovieDetailsViewModel @Inject constructor(
 //                _state.update {
 //                    it.copy(isLoading = false)
 //                }
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(isLoading = false, errorMessage = e.message )
-                }
+            }
+        } catch (e: Exception) {
+            Log.d("MOVIE_ID", "Movie id is 101: ${e.localizedMessage}")
+            _state.update {
+                it.copy(isLoading = false, errorMessage = e.message )
             }
         }
     }

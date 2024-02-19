@@ -20,14 +20,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MVI_Compose"
         tools:targetApi="31"
-        android:usesCleartextTraffic="true"
-        >
-<!--        android:name=".AppClass"-->
-<!--        android:theme="@style/Theme.MVI_Compose"-->
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.MVI_Compose">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
