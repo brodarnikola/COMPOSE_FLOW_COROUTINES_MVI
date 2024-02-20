@@ -30,51 +30,74 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class GithubNetworkModule {
 
-    @Provides
-    @Singleton
-    @GithubNetwork
-    fun provideLoggingInterceptor() =
-        HttpLoggingInterceptor().apply { level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE }
+//    @Provides
+//    @Singleton
+//    @GithubNetwork
+//    fun provideLoggingInterceptor() =
+//        HttpLoggingInterceptor().apply { level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE }
+//
+//    @Provides
+//    @Singleton
+//    @GithubNetwork
+//    fun provideAuthInterceptorOkHttpClient( @GithubNetwork interceptor: HttpLoggingInterceptor): OkHttpClient {
+//        return OkHttpClient.Builder().addInterceptor(interceptor)
+//            .build()
+//    }
+//
+//
+//    @Provides
+//    @Singleton
+//    @GithubNetwork
+//    fun provideGsonConverterFactory( @GithubNetwork gson: Gson): GsonConverterFactory =
+//        GsonConverterFactory.create(gson)
+//
+//    @Singleton
+//    @Provides
+//    @GithubNetwork
+//    fun provideGsonBuilder(): Gson {
+//        return GsonBuilder()
+//            .create()
+//    }
 
     @Provides
     @Singleton
     @GithubNetwork
-    fun provideAuthInterceptorOkHttpClient( @GithubNetwork interceptor: HttpLoggingInterceptor): OkHttpClient {
-        return OkHttpClient.Builder().addInterceptor(interceptor)
+    fun provideOkHttpClient() = if (BuildConfig.DEBUG) {
+        val loggingInterceptor = HttpLoggingInterceptor().also { it.setLevel(HttpLoggingInterceptor.Level.BODY) }
+        OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
             .build()
-    }
-
+    } else OkHttpClient
+        .Builder()
+        .build()
 
     @Provides
     @Singleton
     @GithubNetwork
-    fun provideGsonConverterFactory( @GithubNetwork gson: Gson): GsonConverterFactory =
-        GsonConverterFactory.create(gson)
+    fun provideMoshi(): Moshi =
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+            .add(SerializeNulls.JSON_ADAPTER_FACTORY)
+            .build()
+
 
     @Singleton
     @Provides
     @GithubNetwork
-    fun provideGsonBuilder(): Gson {
-        return GsonBuilder()
-            .create()
-    }
+    fun provideRetrofit(@GithubNetwork client: OkHttpClient,/* @GithubNetwork converterFactory: GsonConverterFactory*/): Retrofit =
+            Retrofit.Builder()
+                .baseUrl(AppConstants.BASE_URL_GITHUB)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+//                .addConverterFactory(converterFactory)
+                .build()
 
     @Singleton
     @Provides
     @GithubNetwork
-    fun provideRetrofit(@GithubNetwork converterFactory: GsonConverterFactory, @GithubNetwork client: OkHttpClient): Retrofit.Builder {
-        return Retrofit.Builder()
-            .client(client)
-            .baseUrl(AppConstants.BASE_URL_GITHUB)
-            .addConverterFactory(converterFactory)
-    }
-
-    @Singleton
-    @Provides
-    @GithubNetwork
-    fun provideGithubRestApiService( @GithubNetwork retrofit: Retrofit.Builder): GithubApi {
+    fun provideGithubRestApiService( @GithubNetwork retrofit: Retrofit): GithubApi {
         return retrofit
-            .build()
             .create(GithubApi::class.java)
     }
 

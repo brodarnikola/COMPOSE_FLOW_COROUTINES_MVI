@@ -124,9 +124,10 @@ fun GithubLocationScreen(
     }
 
     githubLocation.let {
-
         Column(
-            modifier = Modifier.fillMaxWidth().wrapContentHeight()
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
         ) {
             if (githubLocation.country.isEmpty() && githubLocation.location.first == 0.0) {
                 Row(
@@ -207,11 +208,13 @@ fun GithubLocationScreen(
                 }
             }
             Row(
-                modifier = Modifier.padding(10.dp) ,
+                modifier = Modifier.padding(10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextField(
-                    modifier = Modifier.weight(0.7f).padding(10.dp),
+                    modifier = Modifier
+                        .weight(0.7f)
+                        .padding(10.dp),
                     value = githubSearchText.value,
                     onValueChange = { newText ->
                         githubSearchText.value = newText
@@ -223,8 +226,9 @@ fun GithubLocationScreen(
                 Button(
                     modifier = Modifier.weight(0.4f),
                     onClick = {
-
-                }) {
+                        viewModel.onEvent(GithubLocationEvents.SearchGithub(githubSearchText.value))
+                    }
+                ) {
                     Text(
                         modifier = Modifier
                             .height(35.dp)
@@ -251,7 +255,6 @@ fun GithubLocationScreen(
 //            ) { movie ->
 //            }
             }
-
         }
     }
 }

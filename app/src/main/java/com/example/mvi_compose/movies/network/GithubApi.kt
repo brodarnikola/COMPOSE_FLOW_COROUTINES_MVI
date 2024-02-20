@@ -2,13 +2,13 @@ package com.example.mvi_compose.movies.network
 
 
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
+import javax.inject.Singleton
 
 
-/**
- * Used to connect to the Unsplash API to fetch photos
- */
+@Singleton
 interface GithubApi {
 
     @GET("search/repositories")
@@ -16,7 +16,7 @@ interface GithubApi {
         @Query("q") query: String,
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
-    ): GithubResponseApi
+    ): Response<GithubResponseApi>
 
     @GET("search/repositories?sort=stars&order=desc")
     suspend fun searchGithubRepositoryByProgrammingLanguage(

@@ -3,8 +3,11 @@ package com.example.mvi_compose.ui
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mvi_compose.movies.di.github.GithubNetwork
 import com.example.mvi_compose.movies.network.data.movie.Trailer
 import com.example.mvi_compose.movies.network.data.movie.Movie
+import com.example.mvi_compose.movies.repositories.GithubRepo
 import com.example.mvi_compose.movies.repositories.LocationRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GithubLocationViewModel @Inject constructor(
-    private val locationRepo: LocationRepo
+    private val locationRepo: LocationRepo,
+    @GithubNetwork private val githubRepo: GithubRepo
 ) : BaseViewModel<GithubLocationState, GithubLocationEvents>() {
 
     var job: Job? = null
@@ -80,6 +84,14 @@ class GithubLocationViewModel @Inject constructor(
                 onEvent(GithubLocationEvents.GetUserPositionAndCountry)
 //                onContactsPermissionGranted(event.context)
             }
+
+            is GithubLocationEvents.SearchGithub -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val githubResponseApi = githubRepo.getSearchRepositories(event.searchText)
+
+                    Log.d("GITHUB", "githubResponseApi is 1: ${githubResponseApi}")
+                }
+            }
         }
     }
 
@@ -139,6 +151,8 @@ class GithubLocationViewModel @Inject constructor(
 
 
 sealed class GithubLocationEvents : UiEffect {
+
+    data class SearchGithub(val searchText: String = "") : GithubLocationEvents()
     object OnLocationPermissionGranted: GithubLocationEvents()
     object GetUserPositionAndCountry: GithubLocationEvents()
 //    object ShowLocationPermissionRequiredDialog: GithubLocationEvents()
