@@ -13,5 +13,7 @@ class AppConstants {
         const val POSTER_BASE_URL: String = ("http://image.tmdb.org/t/p/w185")
 
         const val REST_API_CALL = "REST_API_CALL"
+
+        const val BASE_URL_GITHUB = "https://pokeapi.co/api/v2/"
     }
 }
