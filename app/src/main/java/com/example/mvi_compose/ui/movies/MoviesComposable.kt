@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
-import com.example.mvi_compose.movies.network.data.Movie
+import com.example.mvi_compose.movies.network.data.movie.Movie
 import com.example.mvi_compose.ui.CounterViewModel
 import com.example.mvi_compose.ui.theme.PurpleGrey40
 import com.example.mvi_compose.R

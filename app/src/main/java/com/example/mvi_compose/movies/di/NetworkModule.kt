@@ -1,11 +1,8 @@
 package com.example.mvi_compose.movies.utils
 
 import com.example.mvi_compose.BuildConfig
-import com.example.mvi_compose.movies.di.MovieNetwork
-import com.example.mvi_compose.movies.network.TrailerApi
 import com.example.mvi_compose.movies.network.MovieApi
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.example.mvi_compose.movies.network.TrailerApi
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonQualifier
 import com.squareup.moshi.Moshi

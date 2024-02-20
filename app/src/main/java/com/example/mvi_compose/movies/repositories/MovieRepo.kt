@@ -1,9 +1,9 @@
 package com.example.mvi_compose.movies.repositories
 
-import com.example.mvi_compose.movies.network.data.TrailerResponse
+import com.example.mvi_compose.movies.network.data.movie.TrailerResponse
 import com.example.mvi_compose.movies.network.NetworkResult
-import com.example.mvi_compose.movies.network.data.Movie
-import com.example.mvi_compose.movies.network.data.MoviesResponse
+import com.example.mvi_compose.movies.network.data.movie.Movie
+import com.example.mvi_compose.movies.network.data.movie.MoviesResponse
 
 interface MovieRepo {
 

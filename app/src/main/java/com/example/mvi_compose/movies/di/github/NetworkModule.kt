@@ -2,6 +2,7 @@ package com.example.mvi_compose.movies.utils
 
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.di.github.GithubNetwork
+import com.example.mvi_compose.movies.network.GithubApi
 import com.example.mvi_compose.movies.network.TrailerApi
 import com.example.mvi_compose.movies.network.MovieApi
 import com.google.gson.Gson
@@ -40,7 +41,6 @@ class GithubNetworkModule {
     @GithubNetwork
     fun provideAuthInterceptorOkHttpClient( @GithubNetwork interceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient.Builder().addInterceptor(interceptor)
-//            .addNetworkInterceptor(StethoInterceptor())
             .build()
     }
 
@@ -72,10 +72,10 @@ class GithubNetworkModule {
     @Singleton
     @Provides
     @GithubNetwork
-    fun provideGithubRestApiService( @GithubNetwork retrofit: Retrofit.Builder): MovieApi {
+    fun provideGithubRestApiService( @GithubNetwork retrofit: Retrofit.Builder): GithubApi {
         return retrofit
             .build()
-            .create(MovieApi::class.java)
+            .create(GithubApi::class.java)
     }
 
 }

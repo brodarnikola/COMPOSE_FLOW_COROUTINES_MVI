@@ -3,8 +3,8 @@ package com.example.mvi_compose.ui
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.network.data.Trailer
-import com.example.mvi_compose.movies.network.data.Movie
+import com.example.mvi_compose.movies.network.data.movie.Trailer
+import com.example.mvi_compose.movies.network.data.movie.Movie
 import com.example.mvi_compose.movies.repositories.LocationRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

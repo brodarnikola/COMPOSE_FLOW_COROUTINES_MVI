@@ -9,12 +9,15 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,8 +27,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -48,7 +54,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.R
-import com.example.mvi_compose.movies.network.data.Trailer
+import com.example.mvi_compose.movies.network.data.movie.Trailer
 import com.example.mvi_compose.ui.GithubLocationEvents
 import com.example.mvi_compose.ui.GithubLocationViewModel
 import com.example.mvi_compose.ui.MovieDetailsState
@@ -70,6 +76,8 @@ fun GithubLocationScreen(
     val context = LocalContext.current
     val githubLocation = viewModel.state.collectAsStateWithLifecycle().value
 
+    val githubSearchText = rememberSaveable { mutableStateOf("") }
+
     val locationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_COARSE_LOCATION) {
             if (it) {
@@ -80,7 +88,6 @@ fun GithubLocationScreen(
         }
 
     LaunchedEffect(key1 = Unit) {
-
         viewModel.uiEffect.collect { event ->
             when (event) {
                 is UiEffect.ShowToast -> {
@@ -118,124 +125,134 @@ fun GithubLocationScreen(
 
     githubLocation.let {
 
-        if (  githubLocation.country.isEmpty() && githubLocation.location.first == 0.0) {
-            Row(modifier = Modifier.padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .width(200.dp)
-                        .wrapContentHeight( ),
-                    text = "Display your country code and position"
-                )
-                if (githubLocation.isLoading) {
-                    CircularProgressIndicator(color = PurpleGrey40)
-                }
-                else {
-                    Button(onClick = {
-                        Log.d(
-                            "LOCATION",
-                            "locationPermissionState status  isGranted: ${locationPermissionState.status.isGranted}"
-                        )
-                        if (locationPermissionState.status.isGranted) {
-                            showSettingsDialog.value = false
-                            viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
-                        } else {
-                            locationPermissionState.launchPermissionRequest()
+        Column(
+            modifier = Modifier.fillMaxWidth().wrapContentHeight()
+        ) {
+            if (githubLocation.country.isEmpty() && githubLocation.location.first == 0.0) {
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .width(200.dp)
+                            .wrapContentHeight(),
+                        text = "Display your country code and position"
+                    )
+                    if (githubLocation.isLoading) {
+                        CircularProgressIndicator(color = PurpleGrey40)
+                    } else {
+                        Button(onClick = {
+                            Log.d(
+                                "LOCATION",
+                                "locationPermissionState status  isGranted: ${locationPermissionState.status.isGranted}"
+                            )
+                            if (locationPermissionState.status.isGranted) {
+                                showSettingsDialog.value = false
+                                viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+                            } else {
+                                locationPermissionState.launchPermissionRequest()
+                            }
+                        }) {
+                            Text(
+                                modifier = Modifier
+                                    .height(35.dp)
+                                    .wrapContentHeight(Alignment.CenterVertically)
+                                    .wrapContentWidth(),
+                                text = "Display"
+                            )
                         }
-                    }) {
-                        Text(
-                            modifier = Modifier
-                                .height(35.dp)
-                                .wrapContentHeight(Alignment.CenterVertically)
-                                .wrapContentWidth(),
-                            text = "Display"
-                        )
                     }
                 }
-            }
-        } else {
+            } else {
 //            ConstraintLayout(
 //                Modifier
 //                    .fillMaxHeight()
 //                    .fillMaxWidth()
 //                    .padding(20.dp)
 //            ) {
-            Column(
-                Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth()
-                    .padding(20.dp)
-            ) {
+                Column(
+                    Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                ) {
 
 //                val countryCode = createRef()
 //                val position = createRef()
 
-                Text(
-                    modifier = Modifier
+                    Text(
+                        modifier = Modifier
 //                        .constrainAs(countryCode) {
 //                            start.linkTo(parent.start)
 //                            top.linkTo(parent.top)
 //                        }
-                        .height(35.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
-                        .fillMaxWidth(.9f),
-                    text = "Country: ${githubLocation.country}"
-                )
-                Text(
-                    modifier = Modifier
+                            .height(35.dp)
+                            .wrapContentHeight(Alignment.CenterVertically)
+                            .fillMaxWidth(.9f),
+                        text = "Country: ${githubLocation.country}"
+                    )
+                    Text(
+                        modifier = Modifier
 //                        .constrainAs(position) {
 //                            start.linkTo(parent.start)
 //                            top.linkTo(countryCode.bottom)
 //                        }
-                        .height(35.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
-                        .fillMaxWidth(.9f),
-                    text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
+                            .height(35.dp)
+                            .wrapContentHeight(Alignment.CenterVertically)
+                            .fillMaxWidth(.9f),
+                        text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.padding(10.dp) ,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextField(
+                    modifier = Modifier.weight(0.7f).padding(10.dp),
+                    value = githubSearchText.value,
+                    onValueChange = { newText ->
+                        githubSearchText.value = newText
+                    },
+                    placeholder = {
+                        Text(text = "Search github")
+                    }
                 )
+                Button(
+                    modifier = Modifier.weight(0.4f),
+                    onClick = {
+
+                }) {
+                    Text(
+                        modifier = Modifier
+                            .height(35.dp)
+                            .wrapContentHeight(Alignment.CenterVertically)
+                            .wrapContentWidth(),
+                        text = "Search"
+                    )
+                }
+            }
+
+            LazyColumn(
+                state = rememberLazyListState(),
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+//            items(
+//                items = finalMovieList.toList() ,
+//                key = { movie ->
+//                    // Return a stable, unique key for the movie
+//                    movie.id
+//                }
+//            ) { movie ->
+//            }
             }
 
         }
-
-        /*if (githubLocation.isLoading) LoadingScreen()
-        else if (githubLocation.country.isNotEmpty() && githubLocation.location.first != 0.0) {
-            Log.d("LOCATION", "Country is 2: ${githubLocation.country}")
-            Log.d("LOCATION", "location is 2: ${githubLocation.location}")
-            ConstraintLayout(
-                Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth()
-                    .padding(20.dp)
-            ) {
-
-                val countryCode = createRef()
-                val position = createRef()
-
-                Text(
-                    modifier = Modifier
-                        .constrainAs(countryCode) {
-                            start.linkTo(parent.start)
-                            top.linkTo(parent.top)
-                        }
-                        .height(35.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
-                        .fillMaxWidth(.9f),
-                    text = "Country: ${githubLocation.country}"
-                )
-                Text(
-                    modifier = Modifier
-                        .constrainAs(position) {
-                            start.linkTo(parent.start)
-                            top.linkTo(countryCode.bottom)
-                        }
-                        .height(35.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
-                        .fillMaxWidth(.9f),
-                    text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
-                )
-            }
-        }*/
     }
 }
 

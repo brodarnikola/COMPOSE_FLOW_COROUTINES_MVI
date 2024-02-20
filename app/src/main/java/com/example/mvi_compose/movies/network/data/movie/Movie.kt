@@ -1,4 +1,4 @@
-package com.example.mvi_compose.movies.network.data
+package com.example.mvi_compose.movies.network.data.movie
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo

@@ -1,7 +1,7 @@
-package com.example.mvi_compose.movies.network.data
+package com.example.mvi_compose.movies.network.data.movie
 
 import android.os.Parcelable
-import com.example.mvi_compose.movies.network.data.Movie
+import com.example.mvi_compose.movies.network.data.movie.Movie
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

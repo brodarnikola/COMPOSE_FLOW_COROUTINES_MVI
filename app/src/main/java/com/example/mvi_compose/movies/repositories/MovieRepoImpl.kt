@@ -3,12 +3,12 @@ package com.example.mvi_compose.movies.repositories
 import android.util.Log
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.network.TrailerApi
-import com.example.mvi_compose.movies.network.data.TrailerResponse
+import com.example.mvi_compose.movies.network.data.movie.TrailerResponse
 import com.example.mvi_compose.movies.network.ApiError
 import com.example.mvi_compose.movies.network.MovieApi
 import com.example.mvi_compose.movies.network.NetworkResult
-import com.example.mvi_compose.movies.network.data.Movie
-import com.example.mvi_compose.movies.network.data.MoviesResponse
+import com.example.mvi_compose.movies.network.data.movie.Movie
+import com.example.mvi_compose.movies.network.data.movie.MoviesResponse
 import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
 import com.example.mvi_compose.movies.utils.MovieDao
 import com.squareup.moshi.Moshi

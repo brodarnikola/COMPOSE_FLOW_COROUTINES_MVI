@@ -5,24 +5,24 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.mvi_compose.movies.network.data.Movie
+import com.example.mvi_compose.movies.network.data.movie.Movie
 
 @Dao
 interface MovieDao {
 
     @Query("SELECT * FROM movies WHERE id = :movieId")
-    fun getMovieById(movieId: Long) : Movie
+    suspend fun getMovieById(movieId: Long) : Movie
 
     @Query("UPDATE movies set isLiked = :isLiked WHERE id = :movieId")
     suspend fun updateLikeStatus(movieId: Int, isLiked: Boolean)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMovie(movie: Movie)
+    suspend fun insertMovie(movie: Movie)
 
     @Query("SELECT id FROM movies")
-    fun fetchFavouriteMovies(): List<Int?>
+    suspend fun fetchFavouriteMovies(): List<Int?>
 
     @Delete()
-    fun removeMovie(movie: Movie)
+    suspend fun removeMovie(movie: Movie)
 
 }

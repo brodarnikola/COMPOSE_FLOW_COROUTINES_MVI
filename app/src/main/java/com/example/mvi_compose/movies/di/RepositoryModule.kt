@@ -1,9 +1,12 @@
 package com.example.mvi_compose.movies.utils
 
 import android.location.Geocoder
+import com.example.mvi_compose.movies.network.GithubApi
 import com.example.mvi_compose.movies.network.TrailerApi
 import com.example.mvi_compose.movies.repositories.MovieRepo
 import com.example.mvi_compose.movies.network.MovieApi
+import com.example.mvi_compose.movies.repositories.GithubRepo
+import com.example.mvi_compose.movies.repositories.GithubRepoImpl
 import com.example.mvi_compose.movies.repositories.LocationRepo
 import com.example.mvi_compose.movies.repositories.LocationRepoImpl
 import com.example.mvi_compose.movies.repositories.MovieRepoImpl
@@ -34,5 +37,11 @@ class RepositoryModule {
     @Provides
     fun provideLocationRepository(fusedLocationClient: FusedLocationProviderClient, geocoder: Geocoder,) : LocationRepo {
         return LocationRepoImpl(fusedLocationClient, geocoder)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGithubRepository(githubApi: GithubApi) : GithubRepo {
+        return GithubRepoImpl(githubApi)
     }
 }
