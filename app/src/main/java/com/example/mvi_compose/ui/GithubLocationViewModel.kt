@@ -4,7 +4,6 @@ import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.movies.network.data.Trailer
-import com.example.mvi_compose.movies.repositories.MovieRepo
 import com.example.mvi_compose.movies.network.data.Movie
 import com.example.mvi_compose.movies.repositories.LocationRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +12,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.job
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,13 +54,13 @@ class GithubLocationViewModel @Inject constructor(
 //                updateLikeStatus()
             }
 
-            GithubLocationEvents.ShowLocationPermissionRequiredDialog -> TODO()
+//            GithubLocationEvents.ShowLocationPermissionRequiredDialog -> TODO()
 
             GithubLocationEvents.GetUserPositionAndCountry -> {
                 job?.cancel()
                 job = viewModelScope.launch(Dispatchers.IO) {
                     _state.update { it.copy(isLoading = true) }
-                    delay(2000)
+                    delay(1500)
                     val position = locationRepo.getLatitudeLongitude()
                     val countryCode = getCountryCode(position)
                     Log.d("LOCATION", "location is 1: ${position}")
@@ -77,8 +75,28 @@ class GithubLocationViewModel @Inject constructor(
                     job?.cancel()
                 }
             }
+
+            is GithubLocationEvents.OnLocationPermissionGranted -> {
+                onEvent(GithubLocationEvents.GetUserPositionAndCountry)
+//                onContactsPermissionGranted(event.context)
+            }
         }
     }
+
+//    private fun onContactsPermissionGranted(context: Context) {
+//        onEvent(GithubLocationEvents.GetUserPositionAndCountry)
+////        if (isOnboardingFlow) {
+////            if (sharedPref.getIsContactsInitiallySynced()) {
+//                sendUiEvent(ContactsPermissionScreenUiEvent.NavigateToConnectThirdPartyAppsScreen)
+////            } else {
+//                // start full sync
+//                _state.update { it.copy(fullSyncLoading = true) }
+//                handleFullSyncWork(context)
+////            }
+////        } else {
+//            sendUiEvent(ContactsPermissionScreenUiEvent.NavigateBack)
+////        }
+//    }
 
     private suspend fun getCountryCode(position: Pair<Double, Double>?): String? {
         position?.let {
@@ -109,20 +127,21 @@ class GithubLocationViewModel @Inject constructor(
     }
 
 
-    fun onPermissionResult(
-        isGranted: Boolean
-    ) {
-        if (!isGranted) {
-            sendUiEvent(event = GithubLocationEvents.ShowLocationPermissionRequiredDialog)
-        }
-    }
+//    fun onPermissionResult(
+//        isGranted: Boolean
+//    ) {
+//        if (!isGranted) {
+//            sendUiEvent(event = GithubLocationEvents.ShowLocationPermissionRequiredDialog)
+//        }
+//    }
 
 }
 
 
 sealed class GithubLocationEvents : UiEffect {
+    object OnLocationPermissionGranted: GithubLocationEvents()
     object GetUserPositionAndCountry: GithubLocationEvents()
-    object ShowLocationPermissionRequiredDialog: GithubLocationEvents()
+//    object ShowLocationPermissionRequiredDialog: GithubLocationEvents()
     object FetchTrailers : GithubLocationEvents()
     object GetLikeState : GithubLocationEvents()
     object UpdateLikeState : GithubLocationEvents()

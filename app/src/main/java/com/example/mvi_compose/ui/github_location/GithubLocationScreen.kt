@@ -1,6 +1,9 @@
 package com.example.mvi_compose.ui.github_location
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,81 +51,144 @@ import com.example.mvi_compose.ui.GithubLocationViewModel
 import com.example.mvi_compose.ui.MovieDetailsState
 import com.example.mvi_compose.ui.UiEffect
 import com.example.mvi_compose.ui.dialogs.ConfirmOrCancelDialog
-import com.example.mvi_compose.ui.extensions.getActivity
-import com.example.mvi_compose.ui.extensions.openAppSettings
 import com.example.mvi_compose.ui.movies.LoadingScreen
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun GithubLocationScreen(
     viewModel: GithubLocationViewModel
 ) {
 
-    val isDisplayedPermissionDialog = rememberSaveable { mutableStateOf(false) }
+    val showSettingsDialog = rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val coarseLocationPermissionResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            viewModel.onPermissionResult(
-//                permission = Manifest.permission.ACCESS_COARSE_LOCATION,
-                isGranted = isGranted
-            )
-            Log.d("LOCATION", "isGranted : ${isGranted}")
-            if (isGranted) {
-                viewModel.onEvent(GithubLocationEvents.GetUserPositionAndCountry)
-                isDisplayedPermissionDialog.value = false
+    val githubLocation = viewModel.state.collectAsStateWithLifecycle().value
+
+    val locationPermissionState =
+        rememberPermissionState(permission = Manifest.permission.ACCESS_COARSE_LOCATION) {
+            if (it) {
+                viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+            } else {
+                showSettingsDialog.value = true
             }
         }
-    )
-
-    LaunchedEffect(key1 = Unit, block = {
-        coarseLocationPermissionResultLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-    })
-
-//    SideEffect {
-//        Log.d("LOCATION", "SideEffect : ${coarseLocationPermissionResultLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)}")
-//    }
 
     LaunchedEffect(key1 = Unit) {
+
         viewModel.uiEffect.collect { event ->
             when (event) {
                 is UiEffect.ShowToast -> {
                     Toast.makeText(context, event.message, event.toastLength).show()
                 }
 
-                is GithubLocationEvents.ShowLocationPermissionRequiredDialog -> {
-                    isDisplayedPermissionDialog.value = true
-                }
+//                is GithubLocationEvents.ShowLocationPermissionRequiredDialog -> {
+////                    isDisplayedPermissionDialog.value = true
+//                }
             }
         }
     }
 
-    if (isDisplayedPermissionDialog.value) {
+
+    if (showSettingsDialog.value) {
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (locationPermissionState.status.isGranted) {
+                showSettingsDialog.value = false
+                viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+            }
+        }
         ConfirmOrCancelDialog(
             titleText = "Permission required",
             descriptionText = "This app requires access to your location in order to display your position",
+            cancelText = "",
             confirmText = "Grant permission",
             onConfirmOrCancel = {
-                if (it) {
-                    context.getActivity()?.openAppSettings()
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Please enable permission to continue",
-                        Toast.LENGTH_SHORT
-                    ).show()
-//                    upPress()
-                }
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", context.packageName, null)
+                intent.data = uri
+                launcher.launch(intent)
+                locationPermissionState.launchPermissionRequest()
+                showSettingsDialog.value = false
             }
         )
     }
 
-    val githubLocation = viewModel.state.collectAsStateWithLifecycle().value
-
     githubLocation.let {
-        if (githubLocation.isLoading) LoadingScreen()
-//        else if( moviesState.error.isNotEmpty() )
-//            ErrorScreen(error = moviesState.error)
+
+        if (githubLocation.country.isNotEmpty() && githubLocation.location.first != 0.0) {
+            Log.d("LOCATION", "Country is 2: ${githubLocation.country}")
+            Log.d("LOCATION", "location is 2: ${githubLocation.location}")
+            ConstraintLayout(
+                Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            ) {
+
+                val countryCode = createRef()
+                val position = createRef()
+
+                Text(
+                    modifier = Modifier
+                        .constrainAs(countryCode) {
+                            start.linkTo(parent.start)
+                            top.linkTo(parent.top)
+                        }
+                        .height(35.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                        .fillMaxWidth(.9f),
+                    text = "Country: ${githubLocation.country}"
+                )
+                Text(
+                    modifier = Modifier
+                        .constrainAs(position) {
+                            start.linkTo(parent.start)
+                            top.linkTo(countryCode.bottom)
+                        }
+                        .height(35.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                        .fillMaxWidth(.9f),
+                    text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
+                )
+            }
+        } else {
+            Text(
+                modifier = Modifier
+                    .height(35.dp)
+                    .wrapContentHeight(Alignment.CenterVertically)
+                    .fillMaxWidth(.9f),
+                text = "Display your country and position"
+            )
+            if (githubLocation.isLoading) LoadingScreen()
+            else {
+                Button(onClick = {
+                    Log.d(
+                        "LOCATION",
+                        "locationPermissionState status  isGranted: ${locationPermissionState.status.isGranted}"
+                    )
+                    if (locationPermissionState.status.isGranted) {
+                        showSettingsDialog.value = false
+                        viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+                    } else {
+                        locationPermissionState.launchPermissionRequest()
+                    }
+                }) {
+                    Text(
+                        modifier = Modifier
+                            .height(35.dp)
+                            .wrapContentHeight(Alignment.CenterVertically)
+                            .fillMaxWidth(.9f),
+                        text = "Display"
+                    )
+                }
+            }
+        }
+
+        /*if (githubLocation.isLoading) LoadingScreen()
         else if (githubLocation.country.isNotEmpty() && githubLocation.location.first != 0.0) {
             Log.d("LOCATION", "Country is 2: ${githubLocation.country}")
             Log.d("LOCATION", "location is 2: ${githubLocation.location}")
@@ -158,15 +225,7 @@ fun GithubLocationScreen(
                     text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
                 )
             }
-//            MovieDetailsDataScreen(
-//                detailsState,
-//                navigateUp = navigateUp,
-//                onFavClicked = {
-//                    viewModel.onEvent(MovieDetailsEvents.UpdateLikeState)
-//                }) { trailerKey ->
-//                openMovieTrailer(trailerKey, context)
-//            }
-        }
+        }*/
     }
 }
 
