@@ -1,10 +1,7 @@
 package com.example.mvi_compose.ui.github_location
 
 import android.Manifest
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,7 +42,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.R
 import com.example.mvi_compose.movies.network.data.Trailer
-import com.example.mvi_compose.movies.utils.AppConstants
 import com.example.mvi_compose.ui.GithubLocationEvents
 import com.example.mvi_compose.ui.GithubLocationViewModel
 import com.example.mvi_compose.ui.MovieDetailsState
@@ -68,18 +63,24 @@ fun GithubLocationScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             viewModel.onPermissionResult(
-                permission = Manifest.permission.ACCESS_COARSE_LOCATION,
+//                permission = Manifest.permission.ACCESS_COARSE_LOCATION,
                 isGranted = isGranted
             )
+            Log.d("LOCATION", "isGranted : ${isGranted}")
             if (isGranted) {
+                viewModel.onEvent(GithubLocationEvents.GetUserPositionAndCountry)
                 isDisplayedPermissionDialog.value = false
             }
         }
     )
-    SideEffect {
-        coarseLocationPermissionResultLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-    }
 
+    LaunchedEffect(key1 = Unit, block = {
+        coarseLocationPermissionResultLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+    })
+
+//    SideEffect {
+//        Log.d("LOCATION", "SideEffect : ${coarseLocationPermissionResultLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)}")
+//    }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.uiEffect.collect { event ->
@@ -87,6 +88,7 @@ fun GithubLocationScreen(
                 is UiEffect.ShowToast -> {
                     Toast.makeText(context, event.message, event.toastLength).show()
                 }
+
                 is GithubLocationEvents.ShowLocationPermissionRequiredDialog -> {
                     isDisplayedPermissionDialog.value = true
                 }
@@ -101,12 +103,13 @@ fun GithubLocationScreen(
             confirmText = "Grant permission",
             onConfirmOrCancel = {
                 if (it) {
-//                    (context.getActivity() as MainActivity).openAppSettings()
-//                    val activity = (context as? Activity)
-//                    activity.openAppSettings()
                     context.getActivity()?.openAppSettings()
                 } else {
-                    Toast.makeText(context, "Please enable permission to continue", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enable permission to continue",
+                        Toast.LENGTH_SHORT
+                    ).show()
 //                    upPress()
                 }
             }
@@ -119,7 +122,42 @@ fun GithubLocationScreen(
         if (githubLocation.isLoading) LoadingScreen()
 //        else if( moviesState.error.isNotEmpty() )
 //            ErrorScreen(error = moviesState.error)
-        else if (githubLocation.trailers?.isNotEmpty() == true) {
+        else if (githubLocation.country.isNotEmpty() && githubLocation.location.first != 0.0) {
+            Log.d("LOCATION", "Country is 2: ${githubLocation.country}")
+            Log.d("LOCATION", "location is 2: ${githubLocation.location}")
+            ConstraintLayout(
+                Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            ) {
+
+                val countryCode = createRef()
+                val position = createRef()
+
+                Text(
+                    modifier = Modifier
+                        .constrainAs(countryCode) {
+                            start.linkTo(parent.start)
+                            top.linkTo(parent.top)
+                        }
+                        .height(35.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                        .fillMaxWidth(.9f),
+                    text = "Country: ${githubLocation.country}"
+                )
+                Text(
+                    modifier = Modifier
+                        .constrainAs(position) {
+                            start.linkTo(parent.start)
+                            top.linkTo(countryCode.bottom)
+                        }
+                        .height(35.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                        .fillMaxWidth(.9f),
+                    text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
+                )
+            }
 //            MovieDetailsDataScreen(
 //                detailsState,
 //                navigateUp = navigateUp,

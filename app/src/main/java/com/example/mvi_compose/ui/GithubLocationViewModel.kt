@@ -9,9 +9,11 @@ import com.example.mvi_compose.movies.network.data.Movie
 import com.example.mvi_compose.movies.repositories.LocationRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.job
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,9 +21,9 @@ class GithubLocationViewModel @Inject constructor(
     private val locationRepo: LocationRepo
 ) : BaseViewModel<GithubLocationState, GithubLocationEvents>() {
 
+    var job: Job? = null
     init {
-        onEvent(GithubLocationEvents.FetchTrailers)
-        onEvent(GithubLocationEvents.GetLikeState)
+//        onEvent(GithubLocationEvents.GetUserPositionAndCountry)
     }
 
     override fun initialState(): GithubLocationState {
@@ -55,7 +57,36 @@ class GithubLocationViewModel @Inject constructor(
             }
 
             GithubLocationEvents.ShowLocationPermissionRequiredDialog -> TODO()
+
+            GithubLocationEvents.GetUserPositionAndCountry -> {
+                job?.cancel()
+                job = viewModelScope.launch(Dispatchers.IO) {
+                    _state.update { it.copy(isLoading = true) }
+                    delay(2000)
+                    val position = locationRepo.getLatitudeLongitude()
+                    val countryCode = getCountryCode(position)
+                    Log.d("LOCATION", "location is 1: ${position}")
+                    Log.d("LOCATION", "country is 2 ${countryCode}")
+                    if (position != null && countryCode != null) {
+                        _state.update { it.copy(location = position, country = countryCode, isLoading = false) }
+                    } else {
+//                        _state.update {
+//                            GithubLocationState(  )
+//                        }
+                    }
+                    job?.cancel()
+                }
+            }
         }
+    }
+
+    private suspend fun getCountryCode(position: Pair<Double, Double>?): String? {
+        position?.let {
+            locationRepo.getCurrentCountry(position.first, position.second)?.let { country ->
+                return  locationRepo.getCountryCode(countryName = country)
+            }
+        }
+        return null
     }
 
     private fun fetchMovieTrailers() {
@@ -79,7 +110,6 @@ class GithubLocationViewModel @Inject constructor(
 
 
     fun onPermissionResult(
-        permission: String,
         isGranted: Boolean
     ) {
         if (!isGranted) {
@@ -91,7 +121,7 @@ class GithubLocationViewModel @Inject constructor(
 
 
 sealed class GithubLocationEvents : UiEffect {
-
+    object GetUserPositionAndCountry: GithubLocationEvents()
     object ShowLocationPermissionRequiredDialog: GithubLocationEvents()
     object FetchTrailers : GithubLocationEvents()
     object GetLikeState : GithubLocationEvents()
@@ -100,7 +130,7 @@ sealed class GithubLocationEvents : UiEffect {
 
 data class GithubLocationState(
 
-    val location: Pair<String, String> = Pair("", ""),
+    val location: Pair<Double, Double> = Pair(0.0, 0.0),
     val country: String = "",
 
     val movie: Movie? = null,
