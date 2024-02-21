@@ -5,10 +5,10 @@ import com.google.gson.annotations.SerializedName
 data class GithubResponseApi(
 
     @SerializedName("total_count")
-    val total_count: Int,
+    val total_count: Int = 0,
     @SerializedName("incomplete_results")
-    val incomplete_results: Boolean,
-    val items: List<RepositoryDetails>
+    val incomplete_results: Boolean = false,
+    val items: List<RepositoryDetails> = listOf()
 )
 
 data class RepositoryDetails(

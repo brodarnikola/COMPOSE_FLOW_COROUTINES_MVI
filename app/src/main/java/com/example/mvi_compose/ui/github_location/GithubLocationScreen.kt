@@ -9,10 +9,10 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -42,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -97,7 +96,6 @@ fun GithubLocationScreen(
         }
     }
 
-
     if (showSettingsDialog.value) {
         val launcher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
@@ -141,7 +139,7 @@ fun GithubLocationScreen(
                             .wrapContentHeight(),
                         text = "Display your country code and position"
                     )
-                    if (githubLocation.isLoading) {
+                    if (githubLocation.locationLoading) {
                         CircularProgressIndicator(color = PurpleGrey40)
                     } else {
                         Button(onClick = {
@@ -173,39 +171,39 @@ fun GithubLocationScreen(
 //                    .fillMaxWidth()
 //                    .padding(20.dp)
 //            ) {
-                Column(
-                    Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                ) {
+//                Column(
+//                    Modifier
+//                        .wrapContentHeight()
+//                        .fillMaxWidth()
+//                        .padding(20.dp)
+//                ) {
 
 //                val countryCode = createRef()
 //                val position = createRef()
 
-                    Text(
-                        modifier = Modifier
+                Text(
+                    modifier = Modifier
 //                        .constrainAs(countryCode) {
 //                            start.linkTo(parent.start)
 //                            top.linkTo(parent.top)
 //                        }
-                            .height(35.dp)
-                            .wrapContentHeight(Alignment.CenterVertically)
-                            .fillMaxWidth(.9f),
-                        text = "Country: ${githubLocation.country}"
-                    )
-                    Text(
-                        modifier = Modifier
+                        .height(35.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                        .fillMaxWidth(.9f),
+                    text = "Country: ${githubLocation.country}"
+                )
+                Text(
+                    modifier = Modifier
 //                        .constrainAs(position) {
 //                            start.linkTo(parent.start)
 //                            top.linkTo(countryCode.bottom)
 //                        }
-                            .height(35.dp)
-                            .wrapContentHeight(Alignment.CenterVertically)
-                            .fillMaxWidth(.9f),
-                        text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
-                    )
-                }
+                        .height(35.dp)
+                        .wrapContentHeight(Alignment.CenterVertically)
+                        .fillMaxWidth(.9f),
+                    text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
+                )
+//                }
             }
             Row(
                 modifier = Modifier.padding(10.dp),
@@ -239,21 +237,47 @@ fun GithubLocationScreen(
                 }
             }
 
-            LazyColumn(
-                state = rememberLazyListState(),
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-//            items(
-//                items = finalMovieList.toList() ,
-//                key = { movie ->
-//                    // Return a stable, unique key for the movie
-//                    movie.id
-//                }
-//            ) { movie ->
-//            }
+            if(githubLocation.githubLoading) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(color = PurpleGrey40)
+                }
+            }
+            else {
+                val githubList = remember { githubLocation.githubResponseApi }
+                Log.d("GITHUB", "githubResponseApi draw data is 1: ${githubList}")
+                LazyColumn(
+                    state = rememberLazyListState(),
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(
+                        items = githubList,
+                        key = { github ->
+                            // Return a stable, unique key for the github repository
+                            github.id
+                        }
+                    ) { github ->
+                        Column(
+                            modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .wrapContentWidth(),
+                                text = "Language: ${github.language}"
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .wrapContentHeight(Alignment.CenterVertically)
+                                    .wrapContentWidth(),
+                                text = "Description: ${github.description}",
+                                maxLines = 3
+                            )
+                        }
+                    }
+                }
             }
         }
     }

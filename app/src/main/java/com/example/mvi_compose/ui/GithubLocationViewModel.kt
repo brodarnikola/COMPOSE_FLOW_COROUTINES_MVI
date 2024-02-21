@@ -3,10 +3,11 @@ package com.example.mvi_compose.ui
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mvi_compose.movies.di.github.GithubNetwork
-import com.example.mvi_compose.movies.network.data.movie.Trailer
+import com.example.mvi_compose.movies.network.NetworkResult
+import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
 import com.example.mvi_compose.movies.network.data.movie.Movie
+import com.example.mvi_compose.movies.network.data.movie.Trailer
 import com.example.mvi_compose.movies.repositories.GithubRepo
 import com.example.mvi_compose.movies.repositories.LocationRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,43 +36,17 @@ class GithubLocationViewModel @Inject constructor(
 
     override fun onEvent(event: GithubLocationEvents) {
         when (event) {
-            is GithubLocationEvents.FetchTrailers -> {
-//                _state.update {
-//                    it.copy(count = it.count + 1)
-//                }
-                sendUiEvent(UiEffect.ShowToast(message = "Incremented by one"))
-                fetchMovieTrailers()
-            }
-
-            is GithubLocationEvents.GetLikeState -> {
-//                _state.update {
-//                    it.copy(count = it.count - 1)
-//                }
-                sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
-//                getLikeState()
-            }
-
-            is GithubLocationEvents.UpdateLikeState -> {
-//                _state.update {
-//                    it.copy(count = it.count - 1)
-//                }
-                sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
-//                updateLikeStatus()
-            }
-
-//            GithubLocationEvents.ShowLocationPermissionRequiredDialog -> TODO()
-
             GithubLocationEvents.GetUserPositionAndCountry -> {
                 job?.cancel()
                 job = viewModelScope.launch(Dispatchers.IO) {
-                    _state.update { it.copy(isLoading = true) }
+                    _state.update { it.copy(locationLoading = true) }
                     delay(1500)
                     val position = locationRepo.getLatitudeLongitude()
                     val countryCode = getCountryCode(position)
                     Log.d("LOCATION", "location is 1: ${position}")
                     Log.d("LOCATION", "country is 2 ${countryCode}")
                     if (position != null && countryCode != null) {
-                        _state.update { it.copy(location = position, country = countryCode, isLoading = false) }
+                        _state.update { it.copy(location = position, country = countryCode, locationLoading = false) }
                     } else {
 //                        _state.update {
 //                            GithubLocationState(  )
@@ -82,33 +58,33 @@ class GithubLocationViewModel @Inject constructor(
 
             is GithubLocationEvents.OnLocationPermissionGranted -> {
                 onEvent(GithubLocationEvents.GetUserPositionAndCountry)
-//                onContactsPermissionGranted(event.context)
             }
 
             is GithubLocationEvents.SearchGithub -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    val githubResponseApi = githubRepo.getSearchRepositories(event.searchText)
+                    _state.update { it.copy( githubLoading = true) }
+                    delay(1000)
+                    when (val result = githubRepo.getSearchRepositories(event.searchText)) {
 
-                    Log.d("GITHUB", "githubResponseApi is 1: ${githubResponseApi}")
+                        is NetworkResult.Error -> {
+
+                        }
+
+                        is NetworkResult.Exception -> {
+
+                        }
+
+                        is NetworkResult.Success -> {
+                            Log.d("GITHUB", "githubResponseApi is 1: ${result.data}")
+                            withContext(Dispatchers.Main) {
+                                _state.update { it.copy(githubResponseApi = result.data.items, githubLoading = false) }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
-//    private fun onContactsPermissionGranted(context: Context) {
-//        onEvent(GithubLocationEvents.GetUserPositionAndCountry)
-////        if (isOnboardingFlow) {
-////            if (sharedPref.getIsContactsInitiallySynced()) {
-//                sendUiEvent(ContactsPermissionScreenUiEvent.NavigateToConnectThirdPartyAppsScreen)
-////            } else {
-//                // start full sync
-//                _state.update { it.copy(fullSyncLoading = true) }
-//                handleFullSyncWork(context)
-////            }
-////        } else {
-//            sendUiEvent(ContactsPermissionScreenUiEvent.NavigateBack)
-////        }
-//    }
 
     private suspend fun getCountryCode(position: Pair<Double, Double>?): String? {
         position?.let {
@@ -119,34 +95,6 @@ class GithubLocationViewModel @Inject constructor(
         return null
     }
 
-    private fun fetchMovieTrailers() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                _state.update {
-                    it.copy(isLoading = true)
-                }
-                delay(2000)
-
-            } catch (e: Exception) {
-                Log.d("MOVIE_ID", "Movie id is 101: ${e.localizedMessage}")
-                _state.update {
-                    it.copy(isLoading = false, errorMessage = e.message)
-                }
-            }
-
-        }
-    }
-
-
-//    fun onPermissionResult(
-//        isGranted: Boolean
-//    ) {
-//        if (!isGranted) {
-//            sendUiEvent(event = GithubLocationEvents.ShowLocationPermissionRequiredDialog)
-//        }
-//    }
-
 }
 
 
@@ -155,21 +103,15 @@ sealed class GithubLocationEvents : UiEffect {
     data class SearchGithub(val searchText: String = "") : GithubLocationEvents()
     object OnLocationPermissionGranted: GithubLocationEvents()
     object GetUserPositionAndCountry: GithubLocationEvents()
-//    object ShowLocationPermissionRequiredDialog: GithubLocationEvents()
-    object FetchTrailers : GithubLocationEvents()
-    object GetLikeState : GithubLocationEvents()
-    object UpdateLikeState : GithubLocationEvents()
 }
 
 data class GithubLocationState(
 
     val location: Pair<Double, Double> = Pair(0.0, 0.0),
     val country: String = "",
+    val locationLoading: Boolean = false,
 
-    val movie: Movie? = null,
-    val isLoading: Boolean = false,
-    val trailers: List<Trailer>? = null,
-    val isLiked: Boolean = false,
-    val trailerExternalIntent: Intent? = null,
-    val errorMessage: String? = null
+    val githubResponseApi: List<RepositoryDetails> = listOf(),
+    val githubLoading: Boolean = false,
+
 )
