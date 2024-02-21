@@ -1,13 +1,10 @@
 package com.example.mvi_compose.ui
 
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.movies.di.github.GithubNetwork
 import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
-import com.example.mvi_compose.movies.network.data.movie.Movie
-import com.example.mvi_compose.movies.network.data.movie.Trailer
 import com.example.mvi_compose.movies.repositories.GithubRepo
 import com.example.mvi_compose.movies.repositories.LocationRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,6 +49,7 @@ class GithubLocationViewModel @Inject constructor(
 //                            GithubLocationState(  )
 //                        }
                     }
+                    sendUiEvent(UiEffect.ShowToast(message = "As effect on this event is displaying your location and country code."))
                     job?.cancel()
                 }
             }
@@ -78,6 +76,9 @@ class GithubLocationViewModel @Inject constructor(
                             Log.d("GITHUB", "githubResponseApi is 1: ${result.data}")
                             withContext(Dispatchers.Main) {
                                 _state.update { it.copy(githubResponseApi = result.data.items, githubLoading = false) }
+                                sendUiEvent(GithubLocationEffect.ShowGithubSuccessMessage(message = "Display effect based on user action. " +
+                                        "User clicked on button search for github and because of that trigger effect. " +
+                                        "Effect is displaying this text message"))
                             }
                         }
                     }
@@ -97,6 +98,9 @@ class GithubLocationViewModel @Inject constructor(
 
 }
 
+sealed class GithubLocationEffect : UiEffect {
+    data class ShowGithubSuccessMessage(val message: String) : GithubLocationEffect()
+}
 
 sealed class GithubLocationEvents : UiEffect {
 

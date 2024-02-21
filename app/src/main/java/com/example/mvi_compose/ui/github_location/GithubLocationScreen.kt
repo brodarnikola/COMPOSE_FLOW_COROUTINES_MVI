@@ -54,6 +54,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.R
 import com.example.mvi_compose.movies.network.data.movie.Trailer
+import com.example.mvi_compose.ui.GithubLocationEffect
 import com.example.mvi_compose.ui.GithubLocationEvents
 import com.example.mvi_compose.ui.GithubLocationViewModel
 import com.example.mvi_compose.ui.MovieDetailsState
@@ -76,6 +77,7 @@ fun GithubLocationScreen(
     val githubLocation = viewModel.state.collectAsStateWithLifecycle().value
 
     val githubSearchText = rememberSaveable { mutableStateOf("") }
+    val githubSuccessMessage = rememberSaveable { mutableStateOf("") }
 
     val locationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_COARSE_LOCATION) {
@@ -91,6 +93,9 @@ fun GithubLocationScreen(
             when (event) {
                 is UiEffect.ShowToast -> {
                     Toast.makeText(context, event.message, event.toastLength).show()
+                }
+                is GithubLocationEffect.ShowGithubSuccessMessage -> {
+                    githubSuccessMessage.value = event.message
                 }
             }
         }
@@ -243,6 +248,16 @@ fun GithubLocationScreen(
                 }
             }
             else {
+                if( githubSuccessMessage.value.isNotEmpty() ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp, vertical = 2.dp)
+                            .wrapContentHeight()
+                            .wrapContentWidth(),
+                        color = colorResource(id = R.color.purple_700),
+                        text = githubSuccessMessage.value
+                    )
+                }
                 val githubList = remember { githubLocation.githubResponseApi }
                 Log.d("GITHUB", "githubResponseApi draw data is 1: ${githubList}")
                 LazyColumn(
