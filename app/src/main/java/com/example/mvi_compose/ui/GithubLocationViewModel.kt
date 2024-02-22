@@ -42,13 +42,13 @@ class GithubLocationViewModel @Inject constructor(
                     val countryCode = getCountryCode(position)
                     Log.d("LOCATION", "location is 1: ${position}")
                     Log.d("LOCATION", "country is 2 ${countryCode}")
-                    if (position != null && countryCode != null) {
-                        _state.update { it.copy(location = position, country = countryCode, locationLoading = false) }
-                    } else {
+//                    if (position != null && countryCode != null) {
+                        _state.update { it.copy(location = position ?: Pair(0.0, 0.0), country = countryCode ?: "Wrong country code. Please try again", locationLoading = false) }
+//                    } else {
 //                        _state.update {
 //                            GithubLocationState(  )
 //                        }
-                    }
+//                    }
                     sendUiEvent(UiEffect.ShowToast(message = "As effect on this event is displaying your location and country code."))
                     job?.cancel()
                 }

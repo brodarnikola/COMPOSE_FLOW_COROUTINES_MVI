@@ -1,33 +1,31 @@
 package com.example.mvi_compose.ui.github_location
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -39,25 +37,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
-import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.R
-import com.example.mvi_compose.movies.network.data.movie.Trailer
 import com.example.mvi_compose.ui.GithubLocationEffect
 import com.example.mvi_compose.ui.GithubLocationEvents
 import com.example.mvi_compose.ui.GithubLocationViewModel
-import com.example.mvi_compose.ui.MovieDetailsState
 import com.example.mvi_compose.ui.UiEffect
 import com.example.mvi_compose.ui.dialogs.ConfirmOrCancelDialog
 import com.example.mvi_compose.ui.theme.PurpleGrey40
@@ -71,7 +58,8 @@ fun GithubLocationScreen(
     viewModel: GithubLocationViewModel
 ) {
 
-    val showSettingsDialog = rememberSaveable { mutableStateOf(false) }
+    val showSettingsLocationDialog = rememberSaveable { mutableStateOf(false) }
+    val showEnableLocationGPSDialog = rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
     val githubLocation = viewModel.state.collectAsStateWithLifecycle().value
@@ -81,10 +69,17 @@ fun GithubLocationScreen(
 
     val locationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_COARSE_LOCATION) {
+            Log.d("LOCATION_TURNED_ON", "is permissions granted 1: ${it}")
             if (it) {
-                viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+                val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    showEnableLocationGPSDialog.value = true
+                }
+                else {
+                    viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+                }
             } else {
-                showSettingsDialog.value = true
+                showSettingsLocationDialog.value = true
             }
         }
 
@@ -101,27 +96,83 @@ fun GithubLocationScreen(
         }
     }
 
-    if (showSettingsDialog.value) {
-        val launcher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (locationPermissionState.status.isGranted) {
-                showSettingsDialog.value = false
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        Log.d("LOCATION_TURNED_ON", "is permissions granted 2: ${locationPermissionState.status.isGranted}")
+        if (locationPermissionState.status.isGranted) {
+            showSettingsLocationDialog.value = false
+
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                // GPS is not enabled, prompt the user to enable it
+                // You can show a dialog here to prompt the user to enable GPS
+                Log.d("LOCATION_TURNED_ON", "is location turned  on.. false")
+                showEnableLocationGPSDialog.value = true
+            }
+            else {
                 viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
             }
         }
+        else {
+            showSettingsLocationDialog.value = false
+        }
+    }
+
+    if (showSettingsLocationDialog.value) {
         ConfirmOrCancelDialog(
             titleText = "Permission required",
             descriptionText = "This app requires access to your location in order to display your position",
             cancelText = "",
             confirmText = "Grant permission",
             onConfirmOrCancel = {
+                showSettingsLocationDialog.value = false
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val uri = Uri.fromParts("package", context.packageName, null)
                 intent.data = uri
-                launcher.launch(intent)
+                locationPermissionLauncher.launch(intent)
                 locationPermissionState.launchPermissionRequest()
-                showSettingsDialog.value = false
+            }
+        )
+    }
+
+    if (showEnableLocationGPSDialog.value) {
+        val locationEnabledResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                Log.d("LOCATION_TURNED_ON", "locationManager status is.. ${locationManager.isLocationEnabled}")
+                Log.d("LOCATION_TURNED_ON", "is true.. ${locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)}")
+            }
+            if ( locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+                showEnableLocationGPSDialog.value = false
+            }
+        }
+        AlertDialog(
+            onDismissRequest = {
+                showEnableLocationGPSDialog.value = false
+            },
+            title = { Text(text = "Location Services Disabled") },
+            text = { Text(text = "Please enable location services in order to use this app.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                        locationEnabledResultLauncher.launch(intent)
+                         //ContextCompat.startActivity(context, intent, null)
+                    }
+                ) {
+                    Text(text = "Open Settings")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick =  {
+                        showEnableLocationGPSDialog.value = false
+                    }
+                ) {
+                    Text(text = "Dismiss")
+                }
             }
         )
     }
@@ -152,11 +203,18 @@ fun GithubLocationScreen(
                                 "LOCATION",
                                 "locationPermissionState status  isGranted: ${locationPermissionState.status.isGranted}"
                             )
-                            if (locationPermissionState.status.isGranted) {
-                                showSettingsDialog.value = false
-                                viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
-                            } else {
-                                locationPermissionState.launchPermissionRequest()
+                            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                            when {
+                                locationPermissionState.status.isGranted && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) -> {
+                                    showSettingsLocationDialog.value = false
+                                    viewModel.onEvent(GithubLocationEvents.OnLocationPermissionGranted)
+                                }
+                                !locationPermissionState.status.isGranted -> {
+                                    locationPermissionState.launchPermissionRequest()
+                                }
+                                !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) -> {
+                                    showEnableLocationGPSDialog.value = true
+                                }
                             }
                         }) {
                             Text(
@@ -170,45 +228,20 @@ fun GithubLocationScreen(
                     }
                 }
             } else {
-//            ConstraintLayout(
-//                Modifier
-//                    .fillMaxHeight()
-//                    .fillMaxWidth()
-//                    .padding(20.dp)
-//            ) {
-//                Column(
-//                    Modifier
-//                        .wrapContentHeight()
-//                        .fillMaxWidth()
-//                        .padding(20.dp)
-//                ) {
-
-//                val countryCode = createRef()
-//                val position = createRef()
-
                 Text(
                     modifier = Modifier
-//                        .constrainAs(countryCode) {
-//                            start.linkTo(parent.start)
-//                            top.linkTo(parent.top)
-//                        }
-                        .height(35.dp)
                         .wrapContentHeight(Alignment.CenterVertically)
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
                         .fillMaxWidth(.9f),
-                    text = "Country: ${githubLocation.country}"
+                    text = "Country code: ${githubLocation.country}"
                 )
                 Text(
                     modifier = Modifier
-//                        .constrainAs(position) {
-//                            start.linkTo(parent.start)
-//                            top.linkTo(countryCode.bottom)
-//                        }
-                        .height(35.dp)
                         .wrapContentHeight(Alignment.CenterVertically)
+                        .padding(horizontal = 20.dp, )
                         .fillMaxWidth(.9f),
                     text = "Latitude: ${githubLocation.location.first},\nLongitude: ${githubLocation.location.second}"
                 )
-//                }
             }
             Row(
                 modifier = Modifier.padding(10.dp),
@@ -293,108 +326,6 @@ fun GithubLocationScreen(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun MovieDetailsDataScreen(
-    detailsState: MovieDetailsState,
-    navigateUp: () -> Unit,
-    onFavClicked: () -> Unit,
-    onTrailerClick: (trailerKey: String) -> Unit,
-) {
-
-    ConstraintLayout(
-        Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .padding(20.dp)
-    ) {
-
-        val arrowBack = createRef()
-        val logo = createRef()
-        val title = createRef()
-        val release = createRef()
-        val votes = createRef()
-        val rate = createRef()
-        val likeIcon = createRef()
-        val plot = createRef()
-        val trailersList = createRef()
-
-        val backgroundColor = colorResource(id = R.color.purple_200)
-        Image(
-            painter = painterResource(id = R.drawable.ic_m3_back_arrow),
-            contentDescription = stringResource(id = R.string.app_name),
-            modifier = Modifier
-                .constrainAs(arrowBack) {
-                    start.linkTo(parent.start)
-                    top.linkTo(parent.top)
-                }
-                .drawBehind {
-                    drawCircle(backgroundColor)
-                }
-                .size(40.dp)
-                .clickable {
-                    navigateUp()
-                }
-        )
-
-        Image(
-            painter = rememberAsyncImagePainter("${BuildConfig.IMAGE_URL}${detailsState.movie?.poster_path}"),
-            contentScale = ContentScale.FillBounds,
-            contentDescription = null,
-            modifier = Modifier
-                .constrainAs(logo) {
-                    start.linkTo(parent.start)
-                    top.linkTo(arrowBack.bottom, margin = 10.dp)
-                }
-                .width(160.dp)
-                .height(135.dp)
-                .padding(end = 10.dp)
-        )
-
-
-    }
-}
-
-@Composable
-fun TrailerList(trailers: List<Trailer>, onTrailerClick: (String) -> Unit) {
-
-    val finalTrailersList = remember { trailers }
-    LazyColumn {
-        items(
-            items = finalTrailersList,
-            key = { trailer ->
-                trailer.id
-            }
-        ) { trailer ->
-            Row(Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }) {
-                    onTrailerClick(trailer.key)
-                },
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                Text(
-                    modifier = Modifier
-                        .height(35.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
-                        .fillMaxWidth(.9f),
-                    text = trailer.name
-                )
-
-                Image(
-                    modifier = Modifier
-                        .padding(2.dp),
-                    painter = painterResource(id = android.R.drawable.ic_media_play),
-                    colorFilter = ColorFilter.tint(Color.Red),
-                    contentDescription = "play icon"
-                )
             }
         }
     }
