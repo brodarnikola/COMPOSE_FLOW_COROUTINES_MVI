@@ -11,6 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -62,26 +64,46 @@ class GithubLocationViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.update { it.copy( githubLoading = true) }
                     delay(1000)
-                    when (val result = githubRepo.getSearchRepositories(event.searchText)) {
 
-                        is NetworkResult.Error -> {
-
-                        }
-
-                        is NetworkResult.Exception -> {
-
-                        }
-
-                        is NetworkResult.Success -> {
-                            Log.d("GITHUB", "githubResponseApi is 1: ${result.data}")
-                            withContext(Dispatchers.Main) {
-                                _state.update { it.copy(githubResponseApi = result.data.items, githubLoading = false) }
-                                sendUiEvent(GithubLocationEffect.ShowGithubSuccessMessage(message = "Display effect based on user action. " +
-                                        "User clicked on button search for github and because of that trigger effect. " +
-                                        "Effect is displaying this text message"))
+                    githubRepo.getSearchRepositories(event.searchText).collectIndexed { index, result ->
+                        Log.d("GITHUB", "githubResponseApi is 1: ${result}")
+                        withContext(Dispatchers.Main) {
+                            _state.update {
+                                it.copy(
+                                    githubResponseApi = result.items,
+                                    githubLoading = false
+                                )
                             }
+                            sendUiEvent(
+                                GithubLocationEffect.ShowGithubSuccessMessage(
+                                    message = "Display effect based on user action. " +
+                                            "User clicked on button search for github and because of that trigger effect. " +
+                                            "Effect is displaying this text message\n\n" +
+                                            "Flow example..\n emited, trigered flow value counter is: $index"
+                                )
+                            )
                         }
                     }
+//                    when (val result = githubRepo.getSearchRepositories(event.searchText)) {
+//
+//                        is NetworkResult.Error -> {
+//
+//                        }
+//
+//                        is NetworkResult.Exception -> {
+//
+//                        }
+//
+//                        is NetworkResult.Success -> {
+//                            Log.d("GITHUB", "githubResponseApi is 1: ${result.data}")
+//                            withContext(Dispatchers.Main) {
+//                                _state.update { it.copy(githubResponseApi = result.data.items, githubLoading = false) }
+//                                sendUiEvent(GithubLocationEffect.ShowGithubSuccessMessage(message = "Display effect based on user action. " +
+//                                        "User clicked on button search for github and because of that trigger effect. " +
+//                                        "Effect is displaying this text message"))
+//                            }
+//                        }
+//                    }
                 }
             }
         }
