@@ -29,8 +29,13 @@ class GithubRepoImpl @Inject constructor(
 
         val latestNews: Flow<GithubResponseApi> = flow {
             while(counter < 3) {
-                val latestNews = service.searchGithubRepository(query, 1, 10)
-                latestNews.body()?.let { emit(it) } // Emits the result of the request to the flow
+                val latestNews = service.searchGithubRepository(query, 1, 10).body()
+                val newResponse = latestNews?.items?.map {
+                    val upperCase = it.copy(language = it.language?.uppercase())
+                    upperCase
+                }
+                val finalResponse = latestNews?.copy(items = newResponse!!)
+                finalResponse?.let { emit(it) } // Emits the result of the request to the flow
                 delay(2000) // Suspends the coroutine for some time
                 counter++
             }

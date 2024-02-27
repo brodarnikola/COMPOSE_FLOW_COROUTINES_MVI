@@ -18,11 +18,4 @@ interface GithubApi {
         @Query("per_page") perPage: Int
     ): Response<GithubResponseApi>
 
-    @GET("search/repositories?sort=stars&order=desc")
-    suspend fun searchGithubRepositoryByProgrammingLanguage(
-        @Query("q") query: String,
-        @Query("page") page: Int,
-        @Query("per_page") perPage: Int
-    ): GithubResponseApi
-
 }

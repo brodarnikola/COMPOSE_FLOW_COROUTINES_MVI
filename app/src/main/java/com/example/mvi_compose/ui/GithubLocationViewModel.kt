@@ -124,7 +124,7 @@ sealed class GithubLocationEffect : UiEffect {
     data class ShowGithubSuccessMessage(val message: String) : GithubLocationEffect()
 }
 
-sealed class GithubLocationEvents : UiEffect {
+sealed class GithubLocationEvents  {
 
     data class SearchGithub(val searchText: String = "") : GithubLocationEvents()
     object OnLocationPermissionGranted: GithubLocationEvents()
