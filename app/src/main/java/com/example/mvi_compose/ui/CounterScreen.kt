@@ -12,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -22,7 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 //import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun CounterScreen(viewModel: CounterViewModel ) {
+fun CounterScreen(viewModel: MovieViewModel ) {
 
     val state = viewModel.state.collectAsStateWithLifecycle().value
     val context = LocalContext.current
@@ -43,7 +42,7 @@ fun CounterScreen(viewModel: CounterViewModel ) {
 }
 
 @Composable
-fun CounterView(state: CounterState, onEvent: (CounterEvent) -> Unit) {
+fun CounterView(state: MovieState, onEvent: (MovieEvent) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,13 +53,17 @@ fun CounterView(state: CounterState, onEvent: (CounterEvent) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row {
-            Button(onClick = { onEvent(CounterEvent.IncrementEvent) }) {
+            Button(onClick = {
+//                onEvent(MovieEvent.IncrementEvent)
+            }) {
                 Text("Increment")
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Button(onClick = { onEvent(CounterEvent.DecrementEvent) }) {
+            Button(onClick = {
+//                onEvent(MovieEvent.DecrementEvent)
+            }) {
                 Text("Decrement")
             }
         }

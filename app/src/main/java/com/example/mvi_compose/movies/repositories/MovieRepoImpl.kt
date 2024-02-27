@@ -40,11 +40,10 @@ class MovieRepoImpl @Inject constructor(
         }
 
         if( networkResult is NetworkResult.Success ) {
-            Log.d(REST_API_CALL,"start popular moview response is")
+            Log.d(REST_API_CALL,"get movies success")
         }
 
         return@withContext networkResult
-//        return movieApi.getMostPopular(BuildConfig.API_KEY)
     }
 
     override suspend fun fetchMovieTrailers(movieId: Int) : NetworkResult<TrailerResponse> = withContext(Dispatchers.IO) {
@@ -55,17 +54,11 @@ class MovieRepoImpl @Inject constructor(
         }
 
         if( networkResult is NetworkResult.Success ) {
-            Log.d(REST_API_CALL,"get movie trailers is 2")
+            Log.d(REST_API_CALL,"get movie trailers success")
         }
 
         return@withContext networkResult
-
-//        return trailerApi.getMovieTrailer(movieId, BuildConfig.API_KEY)
     }
-
-//    override fun isMovieLiked(id: Int): Boolean {
-//        return movieDao.fetchFavouriteMovies().contains(id)
-//    }
 
     override suspend fun changeLikeState(movieId: Int, newLikeState: Boolean) = withContext(Dispatchers.IO) {
         movieDao.updateLikeStatus(movieId, newLikeState)

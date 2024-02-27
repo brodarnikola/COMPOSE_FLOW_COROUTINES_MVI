@@ -43,7 +43,7 @@ class RepositoryModule {
     @Singleton
     @Provides
     @GithubNetwork
-    fun provideGithubRepository(@GithubNetwork githubApi: GithubApi, moshi: Moshi) : GithubRepo {
-        return GithubRepoImpl(githubApi, moshi)
+    fun provideGithubRepository(@GithubNetwork githubApi: GithubApi) : GithubRepo {
+        return GithubRepoImpl(githubApi)
     }
 }

@@ -1,19 +1,11 @@
 package com.example.mvi_compose
 
-import android.content.res.Resources
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.CoroutineScope
 
 object MainDestinations {
     const val HOME = "Home"
@@ -29,21 +21,15 @@ object NavArguments {
 
 @Composable
 fun rememberMainAppState(
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    navController: NavHostController = rememberNavController(),
-    resource: Resources = resources(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope()
+    navController: NavHostController = rememberNavController()
 ) =
-    remember(scaffoldState, navController, resource, coroutineScope) {
-        MainAppState(scaffoldState, navController, resource, coroutineScope)
+    remember(navController) {
+        MainAppState(navController)
     }
 
 @Stable
 class MainAppState(
-    val scaffoldState: ScaffoldState,
-    val navController: NavHostController,
-    private val resources: Resources,
-    coroutineScope: CoroutineScope
+    val navController: NavHostController
 ) {
 
     val currentRoute: String?
@@ -82,10 +68,4 @@ class MainAppState(
     }
 }
 
-@Composable
-@ReadOnlyComposable
-private fun resources(): Resources {
-    LocalConfiguration.current
-    return LocalContext.current.resources
-}
 

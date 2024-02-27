@@ -1,27 +1,15 @@
 package com.example.mvi_compose.movies.repositories
 
-import android.util.Log
-import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.di.github.GithubNetwork
-import com.example.mvi_compose.movies.network.ApiError
 import com.example.mvi_compose.movies.network.GithubApi
-import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
-import com.example.mvi_compose.movies.utils.AppConstants
-import com.squareup.moshi.Moshi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
 
 class GithubRepoImpl @Inject constructor(
-    @GithubNetwork private val service: GithubApi,
-    private val moshi: Moshi
+    @GithubNetwork private val service: GithubApi
 ): GithubRepo {
     override suspend fun getSearchRepositories(query: String) : Flow<GithubResponseApi> {
 

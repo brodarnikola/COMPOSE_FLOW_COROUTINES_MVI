@@ -1,6 +1,7 @@
 package com.example.mvi_compose.ui.movies
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,10 +11,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,17 +24,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.network.data.movie.Movie
-import com.example.mvi_compose.ui.CounterViewModel
+import com.example.mvi_compose.ui.MovieViewModel
 import com.example.mvi_compose.ui.theme.PurpleGrey40
 import com.example.mvi_compose.R
-import com.example.mvi_compose.ui.CounterState
+import com.example.mvi_compose.ui.MovieState
+import com.example.mvi_compose.ui.UiEffect
 
 
 @Composable
-fun MoviesScreen(viewModel: CounterViewModel, onMovieClick: (id: Long) -> Unit) {
+fun MoviesScreen(viewModel: MovieViewModel, onMovieClick: (id: Long) -> Unit) {
 
     Log.d("MOVIE_ID", "Movie id is 22: ${onMovieClick}")
     val moviesState = viewModel.state.collectAsStateWithLifecycle().value
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.uiEffect.collect { event ->
+            when (event) {
+                is UiEffect.ShowToast -> {
+                    Toast.makeText(context, event.message, event.toastLength).show()
+                }
+            }
+        }
+    }
 
     moviesState.let {
         if (moviesState.loading) LoadingScreen()
@@ -43,7 +58,7 @@ fun MoviesScreen(viewModel: CounterViewModel, onMovieClick: (id: Long) -> Unit) 
 
 @Composable
 fun MoviesListScreen(
-    moviesState: CounterState,
+    moviesState: MovieState,
     onMovieClick: (id: Long) -> Unit
 ) {
     val finalMovieList = remember { moviesState.movies }

@@ -23,7 +23,7 @@ class MovieDetailsViewModel @Inject constructor(
 ) : BaseViewModel<MovieDetailsState, MovieDetailsEvents>() {
 
 
-    private var movieId: Long = 0L // checkNotNull(savedStateHandle["id"])
+    private var movieId: Long = 0L
 
     init {
         movieId = savedStateHandle.get<Long>("movieId") ?: 0L
@@ -38,43 +38,18 @@ class MovieDetailsViewModel @Inject constructor(
     override fun onEvent(event: MovieDetailsEvents) {
         when (event) {
             is MovieDetailsEvents.FetchTrailers -> {
-//                _state.update {
-//                    it.copy(count = it.count + 1)
-//                }
-                sendUiEvent(UiEffect.ShowToast(message = "Incremented by one"))
                 fetchMovieTrailers()
             }
 
             is MovieDetailsEvents.GetLikeState -> {
-//                _state.update {
-//                    it.copy(count = it.count - 1)
-//                }
-                sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
                 getLikeState()
             }
 
             is MovieDetailsEvents.UpdateLikeState -> {
-//                _state.update {
-//                    it.copy(count = it.count - 1)
-//                }
-                sendUiEvent(UiEffect.ShowToast(message = "Decremented by one"))
                 updateLikeStatus()
             }
         }
     }
-
-
-//    lateinit var movie: Movie
-//
-//    override fun getInitialState(): DetailsState = DetailsState(movie = movie)
-
-//    override fun processIntents(intent: DetailsIntent) {
-//        when (intent) {
-//            is DetailsIntent.FetchTrailers -> fetchMovieTrailers()
-//            is DetailsIntent.GetLikeState -> getLikeState()
-//            is DetailsIntent.UpdateLikeState -> updateLikeStatus()
-//        }
-//    }
 
     private fun fetchMovieTrailers() {
 
@@ -120,32 +95,11 @@ class MovieDetailsViewModel @Inject constructor(
                     it.copy(isLoading = false, errorMessage = e.message)
                 }
             }
-
-
-//                val results = repository.fetchMovieTrailers(movieId) //  .body()?.results
-//                _state.update {
-//                    it.copy(
-//                        isLoading = false,
-//                        trailerExternalIntent = null,
-//                        trailers = results
-//                    )
-//                }
-//                updateState { oldState ->
-//                    oldState.copy(
-//                        isLoading = false,
-//                        trailerExternalIntent = null,
-//                        trailers = results
-//                    )
-//                }
-//                _state.update {
-//                    it.copy(isLoading = false)
-//                }
         }
     }
 
     private fun updateLikeStatus() {
         viewModelScope.launch(Dispatchers.IO) {
-//            val newLikeState = repository.isMovieLiked(movieId.toInt()).not()
             val movieData = repository.getMovieById(movieId)
             val newLikeState = if( movieData.isLiked == false ) true else false
             Log.d("LIKE_STATUS", "new like variable status is 1:  $newLikeState")
@@ -154,7 +108,6 @@ class MovieDetailsViewModel @Inject constructor(
             Log.d("LIKE_STATUS", "new like variable status is 2:  ${movieData2.isLiked}")
             withContext(Dispatchers.Main) {
                 _state.update { it.copy(isLiked = newLikeState) }
-//                updateState { it.copy(trailerExternalIntent = null, isLiked = newLikeState) }
             }
         }
     }
@@ -178,13 +131,6 @@ sealed class MovieDetailsEvents {
 }
 
 data class MovieDetailsState(
-//    val count: Int = 0,
-////                        val movies: List<Movie> = listOf(),
-////                        var movies: MutableState<MutableList<Movie>> = mutableStateOf(mutableListOf()),
-//    var movies: SnapshotStateList<Movie> = mutableStateListOf(),
-//    val loading: Boolean = false,
-//    val error: String = "",
-
     val movie: Movie? = null,
     val isLoading: Boolean = false,
     val trailers: List<Trailer>? = null,

@@ -9,7 +9,6 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 
 fun Context.getActivity(): ComponentActivity? = when (this) {
-//    is AppCompatActivity -> this
     is ComponentActivity -> this
     is ContextWrapper -> baseContext.getActivity()
     else -> null
