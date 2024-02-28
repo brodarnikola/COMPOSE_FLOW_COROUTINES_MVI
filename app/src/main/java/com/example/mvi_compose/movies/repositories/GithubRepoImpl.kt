@@ -53,6 +53,9 @@ class GithubRepoImpl @Inject constructor(
         if( networkResult is NetworkResult.Success ) {
             Log.d("Shared flow","done fetching api")
         }
+        else if( networkResult is NetworkResult.Error) {
+            Log.d("Shared flow","error fetching api . .${networkResult.message}")
+        }
 
         return@withContext networkResult
     }
@@ -74,6 +77,8 @@ class GithubRepoImpl @Inject constructor(
                         Log.e("Error","handleNetworkRequest error: ${e.localizedMessage}")
                     }
                 }
+                Log.e("Error","handleNetworkRequest error: ${response.message()}")
+                Log.e("Error","handleNetworkRequest error: $apiError")
                 NetworkResult.Error(
                     code = response.code(),
                     message = response.message(),

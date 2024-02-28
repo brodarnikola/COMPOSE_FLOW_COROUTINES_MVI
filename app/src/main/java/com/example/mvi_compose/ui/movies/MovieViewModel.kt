@@ -46,11 +46,15 @@ class MovieViewModel @Inject constructor(
                     when (val result = movieRepo.getPopularMovies()) {
 
                         is NetworkResult.Error -> {
-
+                            Log.d("movie", "apiError is: ${result.apiError}")
+                            Log.d("movie", "message is: ${result.message}")
+                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
                         }
 
                         is NetworkResult.Exception -> {
-
+                            Log.d("movie", "apiError is 1: ${result.e}")
+                            Log.d("movie", "message is 2: ${result.e.localizedMessage}")
+                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
                         }
 
                         is NetworkResult.Success -> {

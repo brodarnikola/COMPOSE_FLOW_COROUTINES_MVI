@@ -9,6 +9,7 @@ import com.example.mvi_compose.ui.BaseViewModel
 import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,14 +40,19 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.FetchAllGithubData -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.update { it.copy(loading = true) }
+                    delay(1000)
                     when (val result = githubRepo.getGithubRepositoriesSharedFlow("Android")) {
 
                         is NetworkResult.Error -> {
-
+                            Log.d("shared flow", "apiError is: ${result.apiError}")
+                            Log.d("shared flow", "message is: ${result.message}")
+                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
                         }
 
                         is NetworkResult.Exception -> {
-
+                            Log.d("shared flow", "apiError is 1: ${result.e}")
+                            Log.d("shared flow", "message is 2: ${result.e.localizedMessage}")
+                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
                         }
 
                         is NetworkResult.Success -> {

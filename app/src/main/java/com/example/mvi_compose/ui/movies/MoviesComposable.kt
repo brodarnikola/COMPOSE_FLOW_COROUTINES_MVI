@@ -119,7 +119,7 @@ fun LoadingScreen() {
 @Composable
 fun ErrorScreen(error: String) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        Text(text = "Oops, $error!")
+        Text(text = error)
     }
 }
 
