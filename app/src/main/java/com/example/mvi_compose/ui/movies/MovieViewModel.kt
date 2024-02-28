@@ -1,4 +1,4 @@
-package com.example.mvi_compose.ui
+package com.example.mvi_compose.ui.movies
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
@@ -10,6 +10,8 @@ import com.example.mvi_compose.movies.repositories.MovieRepoImpl
 import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
 import com.example.mvi_compose.movies.utils.MovieDao
+import com.example.mvi_compose.ui.BaseViewModel
+import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -116,5 +118,6 @@ data class MovieState(
 
     var movies: SnapshotStateList<Movie> = mutableStateListOf(),
 
-    val loading: Boolean = false, val error: String = ""
+    val loading: Boolean = false,
+    val error: String = ""
 )

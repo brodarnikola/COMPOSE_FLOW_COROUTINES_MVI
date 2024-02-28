@@ -1,17 +1,17 @@
-package com.example.mvi_compose.ui
+package com.example.mvi_compose.ui.github_location
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.movies.di.github.GithubNetwork
-import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
 import com.example.mvi_compose.movies.repositories.GithubRepo
 import com.example.mvi_compose.movies.repositories.LocationRepo
+import com.example.mvi_compose.ui.BaseViewModel
+import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,9 +25,6 @@ class GithubLocationViewModel @Inject constructor(
 ) : BaseViewModel<GithubLocationState, GithubLocationEvents>() {
 
     var job: Job? = null
-    init {
-//        onEvent(GithubLocationEvents.GetUserPositionAndCountry)
-    }
 
     override fun initialState(): GithubLocationState {
         return GithubLocationState()
@@ -84,26 +81,6 @@ class GithubLocationViewModel @Inject constructor(
                             )
                         }
                     }
-//                    when (val result = githubRepo.getSearchRepositories(event.searchText)) {
-//
-//                        is NetworkResult.Error -> {
-//
-//                        }
-//
-//                        is NetworkResult.Exception -> {
-//
-//                        }
-//
-//                        is NetworkResult.Success -> {
-//                            Log.d("GITHUB", "githubResponseApi is 1: ${result.data}")
-//                            withContext(Dispatchers.Main) {
-//                                _state.update { it.copy(githubResponseApi = result.data.items, githubLoading = false) }
-//                                sendUiEvent(GithubLocationEffect.ShowGithubSuccessMessage(message = "Display effect based on user action. " +
-//                                        "User clicked on button search for github and because of that trigger effect. " +
-//                                        "Effect is displaying this text message"))
-//                            }
-//                        }
-//                    }
                 }
             }
         }

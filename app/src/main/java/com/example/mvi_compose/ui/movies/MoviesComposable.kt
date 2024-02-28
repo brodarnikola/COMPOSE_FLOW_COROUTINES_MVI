@@ -24,10 +24,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.network.data.movie.Movie
-import com.example.mvi_compose.ui.MovieViewModel
 import com.example.mvi_compose.ui.theme.PurpleGrey40
 import com.example.mvi_compose.R
-import com.example.mvi_compose.ui.MovieState
 import com.example.mvi_compose.ui.UiEffect
 
 

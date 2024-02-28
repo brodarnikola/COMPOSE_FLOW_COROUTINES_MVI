@@ -17,11 +17,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.mvi_compose.ui.movies.MovieEvent
+import com.example.mvi_compose.ui.movies.MovieState
+import com.example.mvi_compose.ui.movies.MovieViewModel
 
 //import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun CounterScreen(viewModel: MovieViewModel ) {
+fun CounterScreen(viewModel: MovieViewModel) {
 
     val state = viewModel.state.collectAsStateWithLifecycle().value
     val context = LocalContext.current

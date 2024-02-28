@@ -28,9 +28,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.mvi_compose.ui.GithubLocationEvents
-import com.example.mvi_compose.ui.GithubLocationState
-import com.example.mvi_compose.ui.GithubLocationViewModel
 import com.example.mvi_compose.ui.dialogs.ConfirmOrCancelDialog
 import com.example.mvi_compose.ui.theme.PurpleGrey40
 import com.google.accompanist.permissions.ExperimentalPermissionsApi

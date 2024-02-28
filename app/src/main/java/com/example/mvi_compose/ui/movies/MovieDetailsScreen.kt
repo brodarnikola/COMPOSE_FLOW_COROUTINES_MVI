@@ -33,11 +33,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
 import com.example.mvi_compose.movies.network.data.movie.Trailer
-import com.example.mvi_compose.ui.MovieDetailsViewModel
 import com.example.mvi_compose.R
 import com.example.mvi_compose.movies.utils.AppConstants
-import com.example.mvi_compose.ui.MovieDetailsEvents
-import com.example.mvi_compose.ui.MovieDetailsState
 
 @Composable
 fun MovieDetailsScreen(

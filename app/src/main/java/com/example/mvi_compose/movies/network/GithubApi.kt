@@ -18,4 +18,11 @@ interface GithubApi {
         @Query("per_page") perPage: Int
     ): Response<GithubResponseApi>
 
+    @GET("search/repositories")
+    suspend fun searchGithubRepositorySharedFlowExample(
+        @Query("q") query: String,
+        @Query("page") page: Int,
+        @Query("per_page") perPage: Int
+    ): Response<GithubResponseApi>
+
 }

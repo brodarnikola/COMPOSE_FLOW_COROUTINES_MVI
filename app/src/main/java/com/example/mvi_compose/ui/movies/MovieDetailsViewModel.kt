@@ -1,4 +1,4 @@
-package com.example.mvi_compose.ui
+package com.example.mvi_compose.ui.movies
 
 import android.content.Intent
 import android.util.Log
@@ -8,6 +8,7 @@ import com.example.mvi_compose.movies.network.data.movie.Trailer
 import com.example.mvi_compose.movies.repositories.MovieRepo
 import com.example.mvi_compose.movies.network.data.movie.Movie
 import com.example.mvi_compose.movies.network.NetworkResult
+import com.example.mvi_compose.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

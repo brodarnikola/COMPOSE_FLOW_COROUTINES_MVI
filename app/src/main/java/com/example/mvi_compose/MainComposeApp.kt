@@ -43,6 +43,7 @@ import androidx.navigation.navArgument
 import com.example.mvi_compose.ui.github_location.GithubLocationScreen
 import com.example.mvi_compose.ui.movies.MovieDetailsScreen
 import com.example.mvi_compose.ui.movies.MoviesScreen
+import com.example.mvi_compose.ui.settings.SettingsScreen
 
 data class BottomNavigationBarItem(
     val title: String,
@@ -260,6 +261,6 @@ fun NavGraphBuilder.mainNavGraph(
         GithubLocationScreen(viewModel = hiltViewModel())
     }
     composable(MainDestinations.MORE) {
-        MoreView()
+        SettingsScreen(viewModel = hiltViewModel())
     }
 }
