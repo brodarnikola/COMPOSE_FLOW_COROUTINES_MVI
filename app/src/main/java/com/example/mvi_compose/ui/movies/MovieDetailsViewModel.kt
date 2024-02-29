@@ -11,12 +11,15 @@ import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.movie.TrailerResponseMapper
 import com.example.mvi_compose.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.immutableListOf
 import javax.inject.Inject
 
 @HiltViewModel
@@ -86,7 +89,7 @@ class MovieDetailsViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     isLoading = false,
-                                    trailerExternalIntent = null,
+//                                    trailerExternalIntent = null,
                                     trailers = finalList.results, // result.data.results,
                                     movie = movie
                                 )
@@ -139,8 +142,8 @@ sealed class MovieDetailsEvents {
 data class MovieDetailsState(
     val movie: Movie? = null,
     val isLoading: Boolean = false,
-    val trailers: List<Trailer>? = null,
+    val trailers: ImmutableList<Trailer> = persistentListOf(), // List<Trailer>? = null,
     val isLiked: Boolean = false,
-    val trailerExternalIntent: Intent? = null,
+//    val trailerExternalIntent: Intent? = null,
     val errorMessage: String? = null
 )
