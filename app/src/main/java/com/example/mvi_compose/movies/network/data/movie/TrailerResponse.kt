@@ -1,13 +1,17 @@
 package com.example.mvi_compose.movies.network.data.movie
 
-import android.os.Parcelable
 import androidx.compose.runtime.Immutable
-import com.example.mvi_compose.movies.network.data.movie.Trailer
-import kotlinx.parcelize.Parcelize
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
-@Immutable
-@Parcelize
+
 data class TrailerResponse(
     val id: Int,
-    val results: List<Trailer>
-) : Parcelable
+    val results: List<Trailer> = listOf()
+)
+
+
+@Immutable
+data class TrailerResponseMapper(
+    val results: ImmutableList<Trailer> = persistentListOf()
+)

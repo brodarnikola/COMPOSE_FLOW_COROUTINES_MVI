@@ -8,8 +8,10 @@ import com.example.mvi_compose.movies.network.data.movie.Trailer
 import com.example.mvi_compose.movies.repositories.MovieRepo
 import com.example.mvi_compose.movies.network.data.movie.Movie
 import com.example.mvi_compose.movies.network.NetworkResult
+import com.example.mvi_compose.movies.network.data.movie.TrailerResponseMapper
 import com.example.mvi_compose.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -75,6 +77,9 @@ class MovieDetailsViewModel @Inject constructor(
 
                     is NetworkResult.Success -> {
 
+                        val newResult = TrailerResponseMapper()
+                        val finalList = newResult.copy(results = result.data.results.toImmutableList())
+
                         Log.d("MOVIE_ID", "Movie id is 55: ${result}")
                         Log.d("MOVIE_ID", "Movie id is 66: ${result.data.results}")
                         withContext(Dispatchers.Main) {
@@ -82,7 +87,7 @@ class MovieDetailsViewModel @Inject constructor(
                                 it.copy(
                                     isLoading = false,
                                     trailerExternalIntent = null,
-                                    trailers = result.data.results,
+                                    trailers = finalList.results, // result.data.results,
                                     movie = movie
                                 )
                             }
