@@ -103,7 +103,7 @@ fun LocationScreen(
 
     if (showEnableLocationGPSDialog.value) {
         val locationEnabledResultLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()) { result ->
+            ActivityResultContracts.StartActivityForResult()) { _ ->
             val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 Log.d("LOCATION_TURNED_ON", "locationManager status is.. ${locationManager.isLocationEnabled}")

@@ -1,6 +1,7 @@
 package com.example.mvi_compose.movies.utils
 
 import com.example.mvi_compose.BuildConfig
+import com.example.mvi_compose.movies.di.MovieNetwork
 import com.example.mvi_compose.movies.network.MovieApi
 import com.example.mvi_compose.movies.network.TrailerApi
 import com.squareup.moshi.JsonAdapter
@@ -28,6 +29,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @MovieNetwork
     fun provideOkHttpClient() = if (BuildConfig.DEBUG) {
         val loggingInterceptor = HttpLoggingInterceptor().also { it.setLevel(HttpLoggingInterceptor.Level.BODY) }
         OkHttpClient.Builder()
@@ -39,6 +41,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @MovieNetwork
     fun provideMoshi(): Moshi =
         Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
@@ -48,8 +51,9 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @MovieNetwork
     fun provideRetrofit(
-        okHttpClient: OkHttpClient
+        @MovieNetwork okHttpClient: OkHttpClient
     ): Retrofit =
         Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -59,11 +63,13 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideMovieService(retrofit: Retrofit): MovieApi = retrofit.create(MovieApi::class.java)
+    @MovieNetwork
+    fun provideMovieService( @MovieNetwork retrofit: Retrofit): MovieApi = retrofit.create(MovieApi::class.java)
 
     @Provides
     @Singleton
-    fun provideTrailerService(retrofit: Retrofit): TrailerApi =
+    @MovieNetwork
+    fun provideTrailerService( @MovieNetwork retrofit: Retrofit): TrailerApi =
         retrofit.create(TrailerApi::class.java)
 
 }

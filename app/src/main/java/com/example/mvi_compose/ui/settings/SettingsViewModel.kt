@@ -27,7 +27,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            sharedFlowExample.githubFlow.collectIndexed { index, value ->
+            sharedFlowExample.githubFlow.collectIndexed { index, _ ->
 
                 Log.d("Shared flow", "Shared flow trigerred index: $index")
                 onEvent(SettingsEvent.FetchAllGithubData)

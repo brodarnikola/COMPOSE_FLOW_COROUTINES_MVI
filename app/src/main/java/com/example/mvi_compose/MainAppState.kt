@@ -41,7 +41,7 @@ class MainAppState(
         }
     }
 
-    fun navigateToMovieDetails(route: String, movieId: Long, popPreviousScreen: Boolean = false) {
+    fun navigateToMovieDetails(route: String, movieId: Long) {
         if (route != currentRoute) {
             navController.navigate("$route/$movieId") {
                 launchSingleTop = true

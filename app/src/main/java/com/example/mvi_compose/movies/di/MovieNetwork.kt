@@ -1,9 +1,8 @@
 package com.example.mvi_compose.movies.di
 
-import java.lang.annotation.Documented
 import javax.inject.Qualifier
 
 @Qualifier
-@Documented
+@MustBeDocumented
 @Retention(AnnotationRetention.RUNTIME)
 annotation class MovieNetwork

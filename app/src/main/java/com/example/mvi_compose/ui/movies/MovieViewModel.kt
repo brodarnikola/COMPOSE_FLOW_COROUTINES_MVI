@@ -76,7 +76,7 @@ class MovieViewModel @Inject constructor(
                             }
 
                             val listFetchImages = mutableListOf<Deferred<Unit>>()
-                            result.data.results.forEachIndexed { index, movie ->
+                            result.data.results.forEachIndexed { index, _ ->
 
                                 listFetchImages.add(
                                     async {
@@ -87,10 +87,10 @@ class MovieViewModel @Inject constructor(
                                             "Random delay is START: ${random} .. ${_state.value.movies[index]}"
                                         )
                                         delay(random.toLong())
-                                        result.data.results.set(
-                                            index,
-                                            result.data.results[index].copy(random_delay = random.toLong())
-                                        )
+//                                        result.data.results.set(
+//                                            index,
+//                                            result.data.results[index].copy(random_delay = random.toLong())
+//                                        )
                                         Log.d(
                                             REST_API_CALL,
                                             "Random delay is FINISH: ${_state.value.movies[index]}"

@@ -2,6 +2,7 @@ package com.example.mvi_compose.movies.repositories
 
 import android.util.Log
 import com.example.mvi_compose.BuildConfig
+import com.example.mvi_compose.movies.di.MovieNetwork
 import com.example.mvi_compose.movies.network.TrailerApi
 import com.example.mvi_compose.movies.network.data.movie.TrailerResponse
 import com.example.mvi_compose.movies.network.ApiError
@@ -23,9 +24,9 @@ import javax.inject.Singleton
 @Singleton
 class MovieRepoImpl @Inject constructor(
     private val movieDao: MovieDao,
-    private val movieApi: MovieApi,
-    private val trailerApi: TrailerApi,
-    private val moshi: Moshi
+    @MovieNetwork private val movieApi: MovieApi,
+    @MovieNetwork private val trailerApi: TrailerApi,
+    @MovieNetwork private val moshi: Moshi
 ) : MovieRepo {
 
     override suspend fun getMovieById(movieId: Long): Movie = withContext(Dispatchers.IO) {

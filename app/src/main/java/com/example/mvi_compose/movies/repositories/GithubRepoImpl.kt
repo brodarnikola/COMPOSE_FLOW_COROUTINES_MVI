@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class GithubRepoImpl @Inject constructor(
     @GithubNetwork private val service: GithubApi,
-    private val moshi: Moshi
+    @GithubNetwork private val moshi: Moshi
 ): GithubRepo {
 
     override suspend fun getSearchRepositories(query: String) : Flow<GithubResponseApi> {

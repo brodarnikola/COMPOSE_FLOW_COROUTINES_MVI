@@ -2,6 +2,7 @@ package com.example.mvi_compose.movies.utils
 
 import android.location.Geocoder
 import com.example.mvi_compose.movies.di.IODispatcher
+import com.example.mvi_compose.movies.di.MovieNetwork
 import com.example.mvi_compose.movies.di.github.GithubNetwork
 import com.example.mvi_compose.movies.network.GithubApi
 import com.example.mvi_compose.movies.network.TrailerApi
@@ -32,9 +33,9 @@ class RepositoryModule {
     @Provides
     fun provideMovieRepository(
         movieDao: MovieDao,
-        moviesApi: MovieApi,
-        trailersApi: TrailerApi,
-        moshi: Moshi
+        @MovieNetwork moviesApi: MovieApi,
+        @MovieNetwork trailersApi: TrailerApi,
+        @MovieNetwork moshi: Moshi
     ): MovieRepo {
         return MovieRepoImpl(movieDao, moviesApi, trailersApi, moshi)
     }
@@ -51,7 +52,7 @@ class RepositoryModule {
     @Singleton
     @Provides
     @GithubNetwork
-    fun provideGithubRepository(@GithubNetwork githubApi: GithubApi, moshi: Moshi): GithubRepo {
+    fun provideGithubRepository(@GithubNetwork githubApi: GithubApi, @GithubNetwork moshi: Moshi): GithubRepo {
         return GithubRepoImpl(githubApi, moshi)
     }
 
