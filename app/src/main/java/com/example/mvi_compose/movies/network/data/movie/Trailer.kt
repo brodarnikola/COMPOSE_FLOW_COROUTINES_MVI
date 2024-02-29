@@ -1,8 +1,10 @@
 package com.example.mvi_compose.movies.network.data.movie
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
+@Immutable
 @Parcelize
 data class Trailer(
     val id: String,
@@ -11,6 +13,6 @@ data class Trailer(
     val key: String,
     val name: String,
     val site: String? = null,
-    var size: Int? = null,
+    val size: Int? = null,
     val type: String? = null
 ) : Parcelable

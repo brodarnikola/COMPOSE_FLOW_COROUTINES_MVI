@@ -1,23 +1,25 @@
 package com.example.mvi_compose.movies.network.data.movie
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
+@Immutable
 @Parcelize
 @Entity(tableName = "movies")
 data class Movie(
     @PrimaryKey
     @ColumnInfo(name = "id")
-    var id: Int,
+    val id: Int,
     @ColumnInfo(name = "vote_count")
-    var vote_count: Int,
+    val vote_count: Int,
     @ColumnInfo(name = "random_delay")
-    var random_delay: Long,
+    val random_delay: Long,
     @ColumnInfo(name = "video")
-    var video: Boolean,
+    val video: Boolean,
     @ColumnInfo(name = "vote_average")
     val vote_average: Double,
     @ColumnInfo(name = "title")
@@ -33,7 +35,7 @@ data class Movie(
     @ColumnInfo(name = "backdrop_path")
     val backdrop_path: String? = "null",
     @ColumnInfo(name = "adult")
-    var adult: Boolean = false,
+    val adult: Boolean = false,
     @ColumnInfo(name = "isLiked")
     val isLiked: Boolean = false,
     @ColumnInfo(name = "overview")

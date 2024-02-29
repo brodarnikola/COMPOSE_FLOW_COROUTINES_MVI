@@ -43,6 +43,7 @@ class MovieViewModel @Inject constructor(
             MovieEvent.FetchAllMovies -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.update { it.copy(loading = true) }
+                    delay(1500)
                     when (val result = movieRepo.getPopularMovies()) {
 
                         is NetworkResult.Error -> {
@@ -80,17 +81,13 @@ class MovieViewModel @Inject constructor(
 
                                 listFetchImages.add(
                                     async {
-                                        val increment = if (index % 2 == 0) 3000 else 1500
-                                        val random = Random.nextInt(500) + increment
+                                        val increment = if (index % 2 == 0) 2000 else 1000
+                                        val random = Random.nextInt(200) + increment
                                         Log.d(
                                             REST_API_CALL,
                                             "Random delay is START: ${random} .. ${_state.value.movies[index]}"
                                         )
                                         delay(random.toLong())
-//                                        result.data.results.set(
-//                                            index,
-//                                            result.data.results[index].copy(random_delay = random.toLong())
-//                                        )
                                         Log.d(
                                             REST_API_CALL,
                                             "Random delay is FINISH: ${_state.value.movies[index]}"
@@ -120,7 +117,7 @@ sealed class MovieEvent {
 data class MovieState(
     val count: Int = 0,
 
-    var movies: SnapshotStateList<Movie> = mutableStateListOf(),
+    val movies: SnapshotStateList<Movie> = mutableStateListOf(),
 
     val loading: Boolean = false,
     val error: String = ""
