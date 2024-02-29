@@ -20,7 +20,7 @@ class SharedFlowExample
     init {
         var counter = 0
         CoroutineScope(ioDispatcher).launch {
-            while (counter < 1) {
+            while (counter < 3) {
                 _githubFlow.emit(Unit)
                 if( counter != 0 )
                     delay(6000)
