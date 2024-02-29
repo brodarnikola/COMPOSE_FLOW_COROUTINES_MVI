@@ -40,7 +40,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.FetchAllGithubData -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     _state.update { it.copy(loading = true) }
-                    delay(1000)
+                    delay(2000)
                     when (val result = githubRepo.getGithubRepositoriesSharedFlow("Android")) {
 
                         is NetworkResult.Error -> {
