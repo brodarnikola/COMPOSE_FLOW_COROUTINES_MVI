@@ -70,9 +70,10 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                 "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination="+
                         project.buildDir.absolutePath + "/compose_metrics",
 
+                // started to creating collections, localDateTime as stable and other classes
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                        "${project.buildDir.absolutePath}/compose_compiler_config.conf"
+                        "${rootDir.absolutePath}/stability-config.txt"
         ]
     }
 }
