@@ -69,6 +69,10 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination="+
                         project.buildDir.absolutePath + "/compose_metrics",
+
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                        "${project.buildDir.absolutePath}/compose_compiler_config.conf"
         ]
     }
 }

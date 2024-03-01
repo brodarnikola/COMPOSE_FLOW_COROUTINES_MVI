@@ -49,7 +49,7 @@ fun MovieDetailsScreen(
         if (detailsState.isLoading) LoadingScreen()
 //        else if( moviesState.error.isNotEmpty() )
 //            ErrorScreen(error = moviesState.error)
-        else if (detailsState.trailers?.isNotEmpty() == true) {
+        else if (detailsState.trailers.isNotEmpty() == true) {
             MovieDetailsDataScreen(
                 detailsState,
                 navigateUp = navigateUp,
@@ -223,7 +223,7 @@ fun MovieDetailsDataScreen(
                 .padding(top = 16.dp)
                 .fillMaxWidth()
                 .fillMaxHeight()) {
-            if (detailsState.trailers?.isNotEmpty() == true)
+            if (detailsState.trailers.isNotEmpty() == true)
                 TrailerList(detailsState.trailers, onTrailerClick)
         }
     }
