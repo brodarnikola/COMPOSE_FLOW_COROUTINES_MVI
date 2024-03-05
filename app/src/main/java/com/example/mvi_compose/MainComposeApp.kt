@@ -40,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.mvi_compose.ui.alerts.AlertsScreen
 import com.example.mvi_compose.ui.github_location.GithubLocationScreen
 import com.example.mvi_compose.ui.movies.MovieDetailsScreen
 import com.example.mvi_compose.ui.movies.MoviesScreen
@@ -213,19 +214,6 @@ fun TabBarBadgeView(count: Int? = null) {
 // end of the reusable components that can be copied over to any new projects
 // ----------------------------------------
 
-// This was added to demonstrate that we are infact changing views when we click a new tab
-@Composable
-fun MoreView() {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Thing 1")
-        Text("Thing 2")
-        Text("Thing 3")
-        Text("Thing 4")
-        Text("Thing 5")
-    }
-}
 
 fun NavGraphBuilder.mainNavGraph(
     navBackStackEntry: State<NavBackStackEntry?>,
@@ -255,7 +243,7 @@ fun NavGraphBuilder.mainNavGraph(
         )
     }
     composable(MainDestinations.ALERTS) {
-        Text("Alerts")
+        AlertsScreen(viewModel = hiltViewModel())
     }
     composable(MainDestinations.SETTINGS) {
         GithubLocationScreen(viewModel = hiltViewModel())

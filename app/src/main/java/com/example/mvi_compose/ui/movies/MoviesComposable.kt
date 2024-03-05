@@ -89,6 +89,8 @@ fun MovieItem(movie: Movie, onMovieClick: (id: Long) -> Unit) {
 //        shape = RoundedCornerShape(8.dp),
 //        elevation = 7.dp,
         modifier = Modifier
+            .height(150.dp)
+            .wrapContentWidth()
 //            .shadow(2.dp)
             .drawBehind {
                 drawRect(color = backgroundColor)

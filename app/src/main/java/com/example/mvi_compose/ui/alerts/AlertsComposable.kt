@@ -1,7 +1,6 @@
-package com.example.mvi_compose.ui.settings
+package com.example.mvi_compose.ui.alerts
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -17,52 +16,36 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.mvi_compose.ui.UiEffect
-import com.example.mvi_compose.ui.alerts.GithubListScreen
+import com.example.mvi_compose.ui.Resource
 import com.example.mvi_compose.ui.github_location.ScrollToTopButton
 import com.example.mvi_compose.ui.movies.ErrorScreen
 import com.example.mvi_compose.ui.movies.LoadingScreen
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel) {
+fun AlertsScreen(viewModel: AlertsViewModel) {
 
-    Log.d("SettingsScreen", "SettingsScreen enter")
-    val settingsState = viewModel.state.collectAsStateWithLifecycle().value
-    val context = LocalContext.current
+    Log.d("AlertsScreen", "AlertsScreen enter")
+    val alertsState = viewModel.state.value.unwrap() ?: AlertContract.AlertState()
 
-    LaunchedEffect(key1 = Unit) {
-        viewModel.uiEffect.collect { event ->
-            when (event) {
-                is UiEffect.ShowToast -> {
-                    Toast.makeText(context, event.message, event.toastLength).show()
-                }
-            }
-        }
-    }
-
-    settingsState.let {
-        if (settingsState.loading) LoadingScreen()
-        else if( settingsState.error.isNotEmpty() )
-            ErrorScreen(error = settingsState.error)
-        else if ( settingsState.githubResponseApi.isNotEmpty()) GithubListScreen(githubState = settingsState)
+    when(viewModel.state.value) {
+        is Resource.Error -> ErrorScreen(error = alertsState.error)
+        is Resource.Initial -> {}
+        is Resource.Loading -> LoadingScreen()
+        is Resource.Success -> GithubListScreen(alertsState = alertsState)
     }
 }
 
 @Composable
-fun GithubListScreen(githubState: SettingsState) {
-    val githubList = remember { githubState.githubResponseApi }
+fun GithubListScreen(alertsState: AlertContract.AlertState) {
+    val githubList = remember { alertsState.repositoryList }
     val githubListState = rememberLazyListState()
 
     val isEnabledDerivedStateCase by remember { derivedStateOf { githubListState.firstVisibleItemIndex != 0 } }

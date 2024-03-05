@@ -1,50 +1,42 @@
 package com.example.mvi_compose.ui
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
-// Model
-//interface State
-//
-//// Intent
-//interface Intent
+abstract class SecondBaseViewModel<T> : ViewModel() {
 
-// ViewModel
-abstract class BaseViewModel3<StateType, EventType> : ViewModel() {
-    protected val _state = MutableStateFlow(this.createInitialState()) // main state
-    val state = _state.asStateFlow()
+    protected val _state: MutableState<Resource<T>> = mutableStateOf(Resource.Loading())
+    val state: State<Resource<T>>
+        get() = _state
 
-    private val _intentChannel = MutableSharedFlow<EventType>()
-    val intentChannel = _intentChannel.asSharedFlow()
+    protected abstract fun initialState(): T
+}
 
-    init {
-        viewModelScope.launch {
-            handleIntents()
-        }
+sealed class Resource<T> {
+    data class Success<T>(val data: T? = null) : Resource<T>() {
+        override fun toString() = "[Success: $data]"
     }
 
-    protected abstract fun createInitialState(): StateType
-
-    protected abstract suspend fun handleIntent(intent: EventType)
-
-    private suspend fun handleIntents() {
-        intentChannel.collect { intent ->
-            handleIntent(intent)
-        }
+    // Optional data allows to expose data stub just for loading state.
+    data class Loading<T>(val data: T? = null) : Resource<T>() {
+        override fun toString() = "[Loading: $data]"
+    }
+    data class Initial<T>(val data: T? = null) : Resource<T>() {
+        override fun toString() = "[Loading: $data]"
     }
 
-//    protected fun setState(state: StateType) {
-//        _state.value = state
-//    }
-//
-//    protected fun sendIntent(intent: EventType) {
-//        viewModelScope.launch {
-//            _intentChannel.emit(intent)
-//        }
-//    }
+    data class Error<T>(val error: T? = null) : Resource<T>() {
+        override fun toString() = "[Failure: $error]"
+    }
+
+    fun unwrap(): T? =
+        when (this) {
+            is Loading -> data
+            is Initial -> data
+            is Success -> data
+            is Error -> error
+        }
+
 }

@@ -60,6 +60,22 @@ class GithubRepoImpl @Inject constructor(
         return@withContext networkResult
     }
 
+    override suspend fun getGithubRepositories(query: String): NetworkResult<GithubResponseApi> = withContext(Dispatchers.IO) {
+        val networkResult = handleNetworkRequest {
+            Log.d("MutableState","start fetching rest api.. this is mutable state example")
+            service.searchGithubRepositorySharedFlowExample(query, 1, 20)
+        }
+
+        if( networkResult is NetworkResult.Success ) {
+            Log.d("MutableState","mutable state done fetching api")
+        }
+        else if( networkResult is NetworkResult.Error) {
+            Log.d("MutableState","mutable state  error fetching api . .${networkResult.message}")
+        }
+
+        return@withContext networkResult
+    }
+
     private suspend fun <T : Any> handleNetworkRequest(apiCall: suspend () -> Response<T>): NetworkResult<T> {
         return try {
             val response: Response<T> = apiCall.invoke()

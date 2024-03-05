@@ -9,6 +9,8 @@ import retrofit2.Response
 
 interface GithubRepo {
 
+    suspend fun getGithubRepositories(query: String) : NetworkResult<GithubResponseApi>
+
     suspend fun getSearchRepositories(query: String) : Flow<GithubResponseApi>
 
     suspend fun getGithubRepositoriesSharedFlow(query: String) : NetworkResult<GithubResponseApi>
