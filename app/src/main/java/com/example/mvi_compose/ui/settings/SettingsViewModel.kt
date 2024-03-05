@@ -1,6 +1,7 @@
 package com.example.mvi_compose.ui.settings
 
 import android.util.Log
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
@@ -8,13 +9,16 @@ import com.example.mvi_compose.movies.repositories.GithubRepoImpl
 import com.example.mvi_compose.ui.BaseViewModel
 import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.system.measureTimeMillis
 
+//@Stable
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val githubRepo: GithubRepoImpl,
@@ -38,28 +42,31 @@ class SettingsViewModel @Inject constructor(
     override fun onEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.FetchAllGithubData -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO + CoroutineName("awesome coroutine")) {
                     _state.update { it.copy(loading = true) }
                     delay(2000)
-                    when (val result = githubRepo.getGithubRepositoriesSharedFlow("Android")) {
+                    val execution = measureTimeMillis {
+                        when (val result = githubRepo.getGithubRepositoriesSharedFlow("Android")) {
 
-                        is NetworkResult.Error -> {
-                            Log.d("shared flow", "apiError is: ${result.apiError}")
-                            Log.d("shared flow", "message is: ${result.message}")
-                            _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
-                        }
+                            is NetworkResult.Error -> {
+                                Log.d("shared flow", "apiError is: ${result.apiError}")
+                                Log.d("shared flow", "message is: ${result.message}")
+                                _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
+                            }
 
-                        is NetworkResult.Exception -> {
-                            Log.d("shared flow", "apiError is 1: ${result.e}")
-                            Log.d("shared flow", "message is 2: ${result.e.localizedMessage}")
-                            _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
-                        }
+                            is NetworkResult.Exception -> {
+                                Log.d("shared flow", "apiError is 1: ${result.e}")
+                                Log.d("shared flow", "message is 2: ${result.e.localizedMessage}")
+                                _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
+                            }
 
-                        is NetworkResult.Success -> {
-                            _state.update { it.copy(loading = false, githubResponseApi = result.data.items) }
-                            sendUiEvent(UiEffect.ShowToast("This is shared flow example.."))
+                            is NetworkResult.Success -> {
+                                _state.update { it.copy(loading = false, githubResponseApi = result.data.items) }
+                                sendUiEvent(UiEffect.ShowToast("This is shared flow example.."))
+                            }
                         }
                     }
+                    Log.d("shared flow", "shared flow execution is: ${execution}")
                 }
             }
         }
