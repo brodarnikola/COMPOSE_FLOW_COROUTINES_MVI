@@ -1,6 +1,7 @@
 package com.example.mvi_compose.ui.alerts
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,17 +17,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.mvi_compose.ui.Resource
 import com.example.mvi_compose.ui.github_location.ScrollToTopButton
 import com.example.mvi_compose.ui.movies.ErrorScreen
 import com.example.mvi_compose.ui.movies.LoadingScreen
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -34,6 +38,15 @@ fun AlertsScreen(viewModel: AlertsViewModel) {
 
     Log.d("AlertsScreen", "AlertsScreen enter")
     val alertsState = viewModel.state.value.unwrap() ?: AlertContract.AlertState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.receiveAsFlow().collect { event ->
+            when (event) {
+                is AlertContract.Effect.DataWasLoaded -> Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     when(viewModel.state.value) {
         is Resource.Error -> ErrorScreen(error = alertsState.error)
