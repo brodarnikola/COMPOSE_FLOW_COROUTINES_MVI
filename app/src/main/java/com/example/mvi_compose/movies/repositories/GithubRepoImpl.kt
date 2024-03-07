@@ -1,12 +1,14 @@
 package com.example.mvi_compose.movies.repositories
 
 import android.util.Log
+import com.example.mvi_compose.movies.di.IODispatcher
 import com.example.mvi_compose.movies.di.github.GithubNetwork
 import com.example.mvi_compose.movies.network.ApiError
 import com.example.mvi_compose.movies.network.GithubApi
 import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +21,8 @@ import javax.inject.Inject
 
 class GithubRepoImpl @Inject constructor(
     @GithubNetwork private val service: GithubApi,
-    @GithubNetwork private val moshi: Moshi
+    @GithubNetwork private val moshi: Moshi,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ): GithubRepo {
 
     override suspend fun getSearchRepositories(query: String) : Flow<GithubResponseApi> {
@@ -44,7 +47,7 @@ class GithubRepoImpl @Inject constructor(
     }
 
     //Shared flow example
-    override suspend fun getGithubRepositoriesSharedFlow(query: String): NetworkResult<GithubResponseApi> = withContext(Dispatchers.IO) {
+    override suspend fun getGithubRepositoriesSharedFlow(query: String): NetworkResult<GithubResponseApi> = withContext(ioDispatcher) {
         val networkResult = handleNetworkRequest {
             Log.d("Shared flow","start fetching rest api.. this is for shared flow example")
             service.searchGithubRepositorySharedFlowExample(query, 1, 20)
@@ -60,7 +63,7 @@ class GithubRepoImpl @Inject constructor(
         return@withContext networkResult
     }
 
-    override suspend fun getGithubRepositories(query: String): NetworkResult<GithubResponseApi> = withContext(Dispatchers.IO) {
+    override suspend fun getGithubRepositories(query: String): NetworkResult<GithubResponseApi> = withContext(ioDispatcher) {
         val networkResult = handleNetworkRequest {
             Log.d("MutableState","start fetching rest api.. this is mutable state example")
             service.searchGithubRepositorySharedFlowExample(query, 1, 20)

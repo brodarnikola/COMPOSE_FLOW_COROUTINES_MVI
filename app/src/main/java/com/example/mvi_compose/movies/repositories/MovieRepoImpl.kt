@@ -2,6 +2,7 @@ package com.example.mvi_compose.movies.repositories
 
 import android.util.Log
 import com.example.mvi_compose.BuildConfig
+import com.example.mvi_compose.movies.di.IODispatcher
 import com.example.mvi_compose.movies.di.MovieNetwork
 import com.example.mvi_compose.movies.network.TrailerApi
 import com.example.mvi_compose.movies.network.data.movie.TrailerResponse
@@ -13,6 +14,7 @@ import com.example.mvi_compose.movies.network.data.movie.MoviesResponse
 import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
 import com.example.mvi_compose.movies.utils.MovieDao
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -26,14 +28,15 @@ class MovieRepoImpl @Inject constructor(
     private val movieDao: MovieDao,
     @MovieNetwork private val movieApi: MovieApi,
     @MovieNetwork private val trailerApi: TrailerApi,
-    @MovieNetwork private val moshi: Moshi
+    @MovieNetwork private val moshi: Moshi,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MovieRepo {
 
-    override suspend fun getMovieById(movieId: Long): Movie = withContext(Dispatchers.IO) {
+    override suspend fun getMovieById(movieId: Long): Movie = withContext(ioDispatcher) {
         return@withContext movieDao.getMovieById(movieId)
     }
 
-    override suspend fun getPopularMovies(): NetworkResult<MoviesResponse> = withContext(Dispatchers.IO) {
+    override suspend fun getPopularMovies(): NetworkResult<MoviesResponse> = withContext(ioDispatcher) {
 
         val networkResult = handleNetworkRequest {
             Log.d(REST_API_CALL,"start popular moview")
@@ -47,7 +50,7 @@ class MovieRepoImpl @Inject constructor(
         return@withContext networkResult
     }
 
-    override suspend fun fetchMovieTrailers(movieId: Int) : NetworkResult<TrailerResponse> = withContext(Dispatchers.IO) {
+    override suspend fun fetchMovieTrailers(movieId: Int) : NetworkResult<TrailerResponse> = withContext(ioDispatcher) {
 
         val networkResult = handleNetworkRequest {
             Log.d(REST_API_CALL,"get movie trailers")
@@ -61,7 +64,7 @@ class MovieRepoImpl @Inject constructor(
         return@withContext networkResult
     }
 
-    override suspend fun changeLikeState(movieId: Int, newLikeState: Boolean) = withContext(Dispatchers.IO) {
+    override suspend fun changeLikeState(movieId: Int, newLikeState: Boolean) = withContext(ioDispatcher) {
         movieDao.updateLikeStatus(movieId, newLikeState)
     }
 

@@ -35,9 +35,10 @@ class RepositoryModule {
         movieDao: MovieDao,
         @MovieNetwork moviesApi: MovieApi,
         @MovieNetwork trailersApi: TrailerApi,
-        @MovieNetwork moshi: Moshi
+        @MovieNetwork moshi: Moshi,
+        @IODispatcher ioDispatcher: CoroutineDispatcher,
     ): MovieRepo {
-        return MovieRepoImpl(movieDao, moviesApi, trailersApi, moshi)
+        return MovieRepoImpl(movieDao, moviesApi, trailersApi, moshi, ioDispatcher)
     }
 
     @Singleton
@@ -52,8 +53,9 @@ class RepositoryModule {
     @Singleton
     @Provides
     @GithubNetwork
-    fun provideGithubRepository(@GithubNetwork githubApi: GithubApi, @GithubNetwork moshi: Moshi): GithubRepo {
-        return GithubRepoImpl(githubApi, moshi)
+    fun provideGithubRepository(@GithubNetwork githubApi: GithubApi, @GithubNetwork moshi: Moshi,
+                                @IODispatcher ioDispatcher: CoroutineDispatcher,): GithubRepo {
+        return GithubRepoImpl(githubApi, moshi, ioDispatcher)
     }
 
     @Singleton
