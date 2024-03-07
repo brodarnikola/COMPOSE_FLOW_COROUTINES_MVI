@@ -9,13 +9,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -50,71 +56,97 @@ fun AlertsScreen(viewModel: AlertsViewModel) {
 
     when(viewModel.state.value) {
         is Resource.Error -> ErrorScreen(error = alertsState.error)
-        is Resource.Initial -> {}
         is Resource.Loading -> LoadingScreen()
-        is Resource.Success -> GithubListScreen(alertsState = alertsState)
+        is Resource.Success -> GithubListScreen(alertsState = alertsState) { searchText ->
+            viewModel.onEvent(AlertContract.AlertsEvents.getAgainAllRepositories(searchText))
+        }
     }
 }
 
 @Composable
-fun GithubListScreen(alertsState: AlertContract.AlertState) {
+fun GithubListScreen(alertsState: AlertContract.AlertState, getAgainAllRepositories: (searchText: String) -> Unit ) {
     val githubList = remember { alertsState.repositoryList }
     val githubListState = rememberLazyListState()
 
     val isEnabledDerivedStateCase by remember { derivedStateOf { githubListState.firstVisibleItemIndex != 0 } }
     val coroutineScope = rememberCoroutineScope()
 
-    Log.d("GITHUB", "githubResponseApi draw data is 1: ${githubList}")
-    LazyColumn(
-        state = githubListState,
-        modifier = Modifier
-            .fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(
-            items = githubList,
-            key = { github ->
-                // Return a stable, unique key for the github repository
-                github.id
-            }
-        ) { github ->
-            Column(
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp)
-            ) {
+    Column {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text(text = "Example of base view model with mutable state.", modifier = Modifier.width(200.dp))
+            Button(onClick = {
+                getAgainAllRepositories("iOS")
+            }) {
+//                Text(text = "Click")
                 androidx.compose.material.Text(
                     modifier = Modifier
-                        .wrapContentHeight()
-                        .wrapContentWidth(),
-                    text = "Language: ${github.language}"
-                )
-                androidx.compose.material.Text(
-                    modifier = Modifier
+                        .height(35.dp)
                         .wrapContentHeight(Alignment.CenterVertically)
                         .wrapContentWidth(),
-                    text = "Description: ${github.description}",
-                    maxLines = 3
+                    text = "Click"
                 )
             }
-        }
-    }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        AnimatedVisibility(
-            visible = isEnabledDerivedStateCase,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            ScrollToTopButton(onClick = {
-                coroutineScope.launch {
-                    githubListState.animateScrollToItem(0)
-                }
-            })
         }
+
+        Log.d("GITHUB", "githubResponseApi draw data is 1: ${githubList}")
+        LazyColumn(
+            state = githubListState,
+            modifier = Modifier
+                .wrapContentHeight(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(
+                items = githubList,
+                key = { github ->
+                    // Return a stable, unique key for the github repository
+                    github.id
+                }
+            ) { github ->
+                Column(
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp)
+                ) {
+                    androidx.compose.material.Text(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .wrapContentWidth(),
+                        text = "Language: ${github.language}"
+                    )
+                    androidx.compose.material.Text(
+                        modifier = Modifier
+                            .wrapContentHeight(Alignment.CenterVertically)
+                            .wrapContentWidth(),
+                        text = "Description: ${github.description}",
+                        maxLines = 3
+                    )
+                }
+            }
+        }
+
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize(),
+//            contentAlignment = Alignment.BottomEnd
+//        ) {
+//            AnimatedVisibility(
+//                visible = isEnabledDerivedStateCase,
+//                enter = fadeIn(),
+//                exit = fadeOut(),
+//            ) {
+//                ScrollToTopButton(onClick = {
+//                    coroutineScope.launch {
+//                        githubListState.animateScrollToItem(0)
+//                    }
+//                })
+//            }
+//        }
     }
 }
 

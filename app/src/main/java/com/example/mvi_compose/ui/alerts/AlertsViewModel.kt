@@ -12,15 +12,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class AlertsViewModel @Inject constructor(
     private val githubRepo: GithubRepoImpl
-) : SecondBaseViewModel<AlertContract.AlertState>() {
+) : SecondBaseViewModel<AlertContract.AlertState, AlertContract.AlertsEvents>() {
 
     override fun initialState(): AlertContract.AlertState {
         return AlertContract.AlertState()
+    }
+
+    override fun onEvent(event: AlertContract.AlertsEvents) {
+        when(event) {
+            is AlertContract.AlertsEvents.initGetAllRepositories -> {
+                getAllRepositories("android") // searchText = android
+            }
+            is AlertContract.AlertsEvents.getAgainAllRepositories -> {
+                getAllRepositories(event.searchText) // searchText = iOS
+            }
+        }
     }
 
     var effects = Channel<AlertContract.Effect>(UNLIMITED)
@@ -28,8 +40,13 @@ class AlertsViewModel @Inject constructor(
 
     init {
         Log.d("MutableState", "_state.value is 00: ${_state.value}")
+        onEvent(AlertContract.AlertsEvents.initGetAllRepositories)
+    }
+
+    private fun getAllRepositories(searchText: String) {
+        _state.value = Resource.Loading(AlertContract.AlertState(isLoading = true))
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = githubRepo.getGithubRepositories("Android")) {
+            when (val result = githubRepo.getGithubRepositories(searchText)) {
                 is NetworkResult.Error -> {
                     Log.d("MutableState", "message is: ${result.message}")
                     _state.value = Resource.Error(_state.value.unwrap()?.copy(error = result.message ?: "There is error occured, please try again"))
@@ -41,45 +58,19 @@ class AlertsViewModel @Inject constructor(
                 }
 
                 is NetworkResult.Success -> {
-                    _state.value = Resource.Success( AlertContract.AlertState(isLoading = false, repositoryList = result.data.items) )
-                    effects.send(AlertContract.Effect.DataWasLoaded(message = "Success.. Displayed github repositories"))
+                    withContext(Dispatchers.Main) {
+                        _state.value = Resource.Success(
+                            AlertContract.AlertState(
+                                isLoading = false,
+                                repositoryList = result.data.items
+                            )
+                        )
+                        effects.send(AlertContract.Effect.DataWasLoaded(message = "Success.. Displayed github repositories"))
+                    }
                 }
             }
         }
     }
-
-    /*override fun onEvent(event: SettingsEvent) {
-        when (event) {
-            SettingsEvent.FetchAllGithubData -> {
-                viewModelScope.launch(Dispatchers.IO + CoroutineName("awesome coroutine")) {
-                    _state.update { it.copy(loading = true) }
-                    delay(2000)
-                    val execution = measureTimeMillis {
-                        when (val result = githubRepo.getGithubRepositoriesSharedFlow("Android")) {
-
-                            is NetworkResult.Error -> {
-                                Log.d("shared flow", "apiError is: ${result.apiError}")
-                                Log.d("shared flow", "message is: ${result.message}")
-                                _state.update { it.copy(loading = false, error = result.message ?: "There is error occured, please try again") }
-                            }
-
-                            is NetworkResult.Exception -> {
-                                Log.d("shared flow", "apiError is 1: ${result.e}")
-                                Log.d("shared flow", "message is 2: ${result.e.localizedMessage}")
-                                _state.update { it.copy(loading = false, error = result.e.localizedMessage ?: "There is error occured, please try again") }
-                            }
-
-                            is NetworkResult.Success -> {
-                                _state.update { it.copy(loading = false, githubResponseApi = result.data.items) }
-                                sendUiEvent(UiEffect.ShowToast("This is shared flow example.."))
-                            }
-                        }
-                    }
-                    Log.d("shared flow", "shared flow execution is: ${execution}")
-                }
-            }
-        }
-    }*/
 }
 
 class AlertContract {
@@ -90,18 +81,12 @@ class AlertContract {
         val error: String = ""
     )
 
+    sealed class AlertsEvents {
+         object initGetAllRepositories: AlertsEvents()
+        data class getAgainAllRepositories(val searchText: String) : AlertsEvents()
+    }
+
     sealed class Effect {
         data class DataWasLoaded(val message: String) : Effect()
     }
 }
-
-sealed class SettingsEvent {
-
-    object FetchAllGithubData: SettingsEvent()
-}
-
-data class SettingsState(
-    val loading: Boolean = false,
-    val error: String = "",
-    val githubResponseApi: List<RepositoryDetails> = listOf(),
-)

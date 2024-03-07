@@ -5,36 +5,34 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-abstract class SecondBaseViewModel<T> : ViewModel() {
+abstract class SecondBaseViewModel<StateType, Event> : ViewModel() {
 
-    protected val _state: MutableState<Resource<T>> = mutableStateOf(Resource.Loading())
-    val state: State<Resource<T>>
+    protected val _state: MutableState<Resource<StateType>> = mutableStateOf(Resource.Loading())
+    val state: State<Resource<StateType>>
         get() = _state
 
-    protected abstract fun initialState(): T
+    protected abstract fun initialState(): StateType
+
+    abstract fun onEvent(event: Event)
 }
 
-sealed class Resource<T> {
-    data class Success<T>(val data: T? = null) : Resource<T>() {
+sealed class Resource<StateType> {
+    data class Success<StateType>(val data: StateType? = null) : Resource<StateType>() {
         override fun toString() = "[Success: $data]"
     }
 
     // Optional data allows to expose data stub just for loading state.
-    data class Loading<T>(val data: T? = null) : Resource<T>() {
-        override fun toString() = "[Loading: $data]"
-    }
-    data class Initial<T>(val data: T? = null) : Resource<T>() {
+    data class Loading<StateType>(val data: StateType? = null) : Resource<StateType>() {
         override fun toString() = "[Loading: $data]"
     }
 
-    data class Error<T>(val error: T? = null) : Resource<T>() {
+    data class Error<StateType>(val error: StateType? = null) : Resource<StateType>() {
         override fun toString() = "[Failure: $error]"
     }
 
-    fun unwrap(): T? =
+    fun unwrap(): StateType? =
         when (this) {
             is Loading -> data
-            is Initial -> data
             is Success -> data
             is Error -> error
         }
