@@ -10,8 +10,8 @@ import androidx.navigation.compose.rememberNavController
 object MainDestinations {
     const val HOME = "Home"
     const val ALERTS = "Alerts"
+    const val LOCATION = "Location"
     const val SETTINGS = "Settings"
-    const val MORE = "More"
     const val MOVIE_DETAILS = "MovieDetails"
 }
 

@@ -5,10 +5,8 @@ import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
 
 @Immutable
-@Parcelize
 @Entity(tableName = "movies")
 data class Movie(
     @PrimaryKey
@@ -42,4 +40,4 @@ data class Movie(
     val overview: String?,
     @ColumnInfo(name = "release_date")
     val release_date: String?
-) : Parcelable
+)

@@ -3,7 +3,6 @@ package com.example.mvi_compose
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -69,21 +68,21 @@ fun bottomNavigationItems(): List<BottomNavigationBarItem> {
         unselectedIcon = Icons.Outlined.Email,
         badgeAmount = 7
     )
+    val locationTab = BottomNavigationBarItem(
+        title = "Location",
+        route =  MainDestinations.LOCATION,
+        selectedIcon = Icons.Filled.Person,
+        unselectedIcon = Icons.Outlined.Person
+    )
     val settingsTab = BottomNavigationBarItem(
         title = "Settings",
         route =  MainDestinations.SETTINGS,
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )
-    val moreTab = BottomNavigationBarItem(
-        title = "More",
-        route =  MainDestinations.MORE,
-        selectedIcon = Icons.Filled.Person,
-        unselectedIcon = Icons.Outlined.Person
-    )
 
     // creating a list of all the tabs
-    val tabBarItems = listOf(homeTab, alertsTab, settingsTab, moreTab)
+    val tabBarItems = listOf(homeTab, alertsTab, locationTab,settingsTab)
     return tabBarItems
 }
 
@@ -173,10 +172,10 @@ fun NavGraphBuilder.mainNavGraph(
         AlertsScreen(viewModel = hiltViewModel())
     }
     composable(MainDestinations.SETTINGS) {
-        GithubLocationScreen(viewModel = hiltViewModel())
-    }
-    composable(MainDestinations.MORE) {
         SettingsScreen(viewModel = hiltViewModel())
+    }
+    composable(MainDestinations.LOCATION) {
+        GithubLocationScreen(viewModel = hiltViewModel())
     }
 }
 
