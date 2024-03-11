@@ -37,7 +37,7 @@ data class Movie(
     @ColumnInfo(name = "adult")
     val adult: Boolean = false,
     @ColumnInfo(name = "isLiked")
-    val isLiked: Boolean = false,
+    val isLiked: Boolean? = false,
     @ColumnInfo(name = "overview")
     val overview: String?,
     @ColumnInfo(name = "release_date")

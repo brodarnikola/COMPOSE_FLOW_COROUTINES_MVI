@@ -142,6 +142,44 @@ fun MainComposeApp(
     }
 }
 
+fun NavGraphBuilder.mainNavGraph(
+    navBackStackEntry: State<NavBackStackEntry?>,
+    goToMovieDetails: (route: String, movieId: Long) -> Unit,
+    navigateUp:() -> Unit
+) {
+    composable(MainDestinations.HOME) {
+        MoviesScreen(
+            viewModel = hiltViewModel(), // viewModel,
+            onMovieClick = { movieId ->
+                if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                    goToMovieDetails(MainDestinations.MOVIE_DETAILS,  movieId)
+                }
+            })
+    }
+    composable(
+        "${MainDestinations.MOVIE_DETAILS}/{${NavArguments.MOVIE_ID}}",
+        arguments = listOf(navArgument(NavArguments.MOVIE_ID) {
+            type = NavType.LongType
+        })
+    ) {
+        MovieDetailsScreen(
+            viewModel = hiltViewModel(),
+            navigateUp = {
+                navigateUp()
+            }
+        )
+    }
+    composable(MainDestinations.ALERTS) {
+        AlertsScreen(viewModel = hiltViewModel())
+    }
+    composable(MainDestinations.SETTINGS) {
+        GithubLocationScreen(viewModel = hiltViewModel())
+    }
+    composable(MainDestinations.MORE) {
+        SettingsScreen(viewModel = hiltViewModel())
+    }
+}
+
 
 // ----------------------------------------
 // This is a wrapper view that allows us to easily and cleanly
@@ -214,41 +252,3 @@ fun TabBarBadgeView(count: Int? = null) {
 // end of the reusable components that can be copied over to any new projects
 // ----------------------------------------
 
-
-fun NavGraphBuilder.mainNavGraph(
-    navBackStackEntry: State<NavBackStackEntry?>,
-    goToMovieDetails: (route: String, movieId: Long) -> Unit,
-    navigateUp:() -> Unit
-) {
-    composable(MainDestinations.HOME) {
-        MoviesScreen(
-            viewModel = hiltViewModel(), // viewModel,
-            onMovieClick = { movieId ->
-                if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
-                    goToMovieDetails(MainDestinations.MOVIE_DETAILS,  movieId)
-                }
-            })
-    }
-    composable(
-        "${MainDestinations.MOVIE_DETAILS}/{${NavArguments.MOVIE_ID}}",
-        arguments = listOf(navArgument(NavArguments.MOVIE_ID) {
-            type = NavType.LongType
-        })
-    ) {
-        MovieDetailsScreen(
-            viewModel = hiltViewModel(),
-            navigateUp = {
-                navigateUp()
-            }
-        )
-    }
-    composable(MainDestinations.ALERTS) {
-        AlertsScreen(viewModel = hiltViewModel())
-    }
-    composable(MainDestinations.SETTINGS) {
-        GithubLocationScreen(viewModel = hiltViewModel())
-    }
-    composable(MainDestinations.MORE) {
-        SettingsScreen(viewModel = hiltViewModel())
-    }
-}

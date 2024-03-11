@@ -41,8 +41,8 @@ class MovieViewModel @Inject constructor(
     override fun onEvent(event: MovieEvent) {
         when (event) {
             MovieEvent.FetchAllMovies -> {
+                _state.update { it.copy(loading = true) }
                 viewModelScope.launch(Dispatchers.IO) {
-                    _state.update { it.copy(loading = true) }
                     delay(1500)
                     when (val result = movieRepo.getPopularMovies()) {
 
