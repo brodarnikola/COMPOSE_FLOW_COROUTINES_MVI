@@ -63,6 +63,11 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = "17"
         freeCompilerArgs += [
+//               That means maybe some compose function will become skippable, but some non-restarble Compose function will become unskippable
+                // In other words, that means some compose function will be better, have better perfomance, while some will have worse performance
+//                "-P",
+//                "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
+
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
                         project.buildDir.absolutePath + "/compose_metrics",
