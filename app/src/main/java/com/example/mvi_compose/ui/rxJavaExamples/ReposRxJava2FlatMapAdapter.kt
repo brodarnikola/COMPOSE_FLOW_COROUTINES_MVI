@@ -1,5 +1,6 @@
 package com.example.mvi_compose.ui.rxJavaExamples
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +46,10 @@ class ReposRxJava2FlatMapAdapter :
 
     fun updatePost(post: Post) {
         val position = posts.indexOf(post)
+        Log.d("rxjavatag", "size is: ${posts.size}")
+        Log.d("rxjavatag", "post size is: ${post.comments.size}")
+        Log.d("rxjavatag", "comments is: ${post.comments}")
+//        posts[position] = posts.set(position, post)
         posts.set(position, post)
         notifyItemChanged(posts.indexOf(post))
     }
@@ -60,12 +65,12 @@ class ReposRxJava2FlatMapAdapter :
         var progressBar: ProgressBar
         fun bind(post: Post) {
             title.setText(post.title)
-            if (post.comments  == null) {
+            if (post.comments.isEmpty()) {
                 showProgressBar(true)
                 numComments.text = ""
             } else {
                 showProgressBar(false)
-                numComments.setText("" + post.comments!!.size)
+                numComments.setText("" + post.comments.size)
             }
         }
 

@@ -4,9 +4,9 @@ package com.example.mvi_compose.movies.network
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import com.example.mvi_compose.ui.rxJavaExamples.Comment
 import com.example.mvi_compose.ui.rxJavaExamples.Post
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

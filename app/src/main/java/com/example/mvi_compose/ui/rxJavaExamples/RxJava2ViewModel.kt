@@ -7,9 +7,7 @@ import com.example.mvi_compose.movies.di.github.GithubNetwork
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import com.example.mvi_compose.movies.repositories.GithubRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.Single
 import javax.inject.Inject
 
 

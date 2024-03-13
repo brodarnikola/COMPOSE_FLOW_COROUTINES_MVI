@@ -8,5 +8,5 @@ data class Post(
     val id: Int = 0,
     val title: String? = "",
     val body: String? = "",
-    val comments: List<Comment> = listOf()
+    var comments: List<Comment> = listOf()
 )

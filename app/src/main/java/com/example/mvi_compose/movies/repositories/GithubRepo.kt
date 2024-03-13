@@ -3,8 +3,8 @@ package com.example.mvi_compose.movies.repositories
 import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import com.example.mvi_compose.movies.network.data.movie.MoviesResponse
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.Flowable
+import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 

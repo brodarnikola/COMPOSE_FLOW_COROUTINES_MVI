@@ -1,6 +1,7 @@
 package com.example.mvi_compose.ui.rxJavaExamples
 
 
+import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,20 +15,22 @@ import com.example.mvi_compose.databinding.Rxjava2TutorialBinding
 import com.example.mvi_compose.movies.network.GithubApi
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
- import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.functions.Predicate
-import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Predicate
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import kotlin.jvm.Throws
 import kotlin.random.Random
 
 
@@ -73,28 +76,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
         viewModel.incrementNumberAutomaticallyByOne.observe(this, nameObserver)
 
-//        viewModel.incrementNumberAutomaticallyByOne.observe(lifecycleScope, { currentNumber -> // Observer { currentNumber ->
-//            binding?.tvNumberIncreaseAutomatically?.text = "" + currentNumber
-//        })
     }
-
-//    @RequiresApi(Build.VERSION_CODES.S)
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState)
-//
-//        binding = Rxjava2TutorialBinding.inflate(inflater, container, false)
-//
-//        viewModel.incrementNumberAutomaticallyByOne.observe(viewLifecycleOwner, { currentNumber -> // Observer { currentNumber ->
-//            binding?.tvNumberIncreaseAutomatically?.text = "" + currentNumber
-//        })
-//
-//    }
-//
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        viewModel = ViewModelProvider(this)[RxJava2ViewModel::class.java]
-//    }
 
     private fun initRecyclerView() {
         adapter = ReposRxJava2FlatMapAdapter()
@@ -128,7 +110,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
                 getCommentsObservable(posts)
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<Post> {
+            .subscribe(object : io.reactivex.Observer<Post> {
 
 
                 override fun onComplete() {}
@@ -143,28 +125,27 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
                 }
 
                 override fun onError(e: Throwable) {
-                    Log.e(RX_JAVA_TAG, "onError received: ", e)
+                    Log.e(ContentValues.TAG, "onError received: ", e)
                 }
             })
     }
 
     private fun getPostObservable() : Observable<Post> {
-
         val resultPost = setupRetrofitFlatMap()
-            .getPosts()
+            .getPosts( )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .flatMap { posts: List<Post> ->
-                // Update your adapter with the received list of posts
-                adapter?.setPosts(posts.toMutableList())
-
-                // Transform the list of posts to an Observable emitting individual posts
-                Observable.fromIterable(posts)
-                    .subscribeOn(Schedulers.io())
-            }
+            .flatMap( object : io.reactivex.functions.Function< List<Post> , ObservableSource<Post>> {
+                //@Throws
+                override fun apply( posts: List<Post> ) : ObservableSource<Post>  {
+                    adapter?.setPosts(posts.toMutableList())
+                    return Observable.fromIterable(posts)
+                        .subscribeOn(Schedulers.io())
+                }
+            })
             .onErrorReturn { error ->
-                Log.e(RX_JAVA_TAG, "onError received: $error")
-                Post() // Return a default Post in case of error
+                Log.e(ContentValues.TAG, "onError received: ${error}")
+                Post()
             }
         return resultPost
     }
@@ -174,29 +155,28 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
             .getComments( post.id )
             .map { comments ->
 
-                val delay: Int = (Random.nextInt(3) + 1) * 1000 // sleep thread for x ms
+                val delay: Int = (java.util.Random().nextInt(3) + 1) * 1000 // sleep thread for x ms
 
                 try {
                     Thread.sleep(delay.toLong())
                 } catch (e: InterruptedException) {
                     Thread.currentThread().interrupt() // restore interrupted status
                 } catch (exception: Exception) {
-                    Log.e(RX_JAVA_TAG, "onError received: ${exception}")
+                    Log.e(ContentValues.TAG, "onError received: ${exception}")
                 }
                 Log.d(
-                    RX_JAVA_TAG,
+                    ContentValues.TAG,
                     "apply: sleeping thread " + Thread.currentThread()
                         .name + " for " + delay.toString() + "ms"
                 )
 
-                val postWithComments = post.copy(comments = comments)
-//                post.comments = comments
-                postWithComments
+                post.comments = comments
+                post
 
             }
             .subscribeOn(Schedulers.io())
             .onErrorReturn { error ->
-                Log.e(RX_JAVA_TAG, "onError received: ${error}")
+                Log.e(ContentValues.TAG, "onError received: ${error}")
                 Post()
             }
 
@@ -207,7 +187,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         return Retrofit.Builder()
             .baseUrl("https://jsonplaceholder.typicode.com/")
             .addConverterFactory(GsonConverterFactory.create())
-             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build().create(GithubApi::class.java)
     }
 
@@ -222,32 +202,33 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
 
         githubReposCompositeDisposable = CompositeDisposable()
         githubReposCompositeDisposable?.addAll(
+
             searchGithubRepos(3),
             searchGithubRepos(3)
         )
     }
 
-    private fun searchGithubRepos( sizeOfGithubRepos: Int): Disposable {
+    private fun searchGithubRepos( sizeOfGithubRepos: Int): Disposable? {
         // this is a single example of rxjava2 for github repositories
         return  viewModel.getGithubRepositories("java", 1, sizeOfGithubRepos)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorReturn { error ->
-                Log.e(RX_JAVA_TAG, "onError received: ${error}")
+                Log.e(ContentValues.TAG, "onError received: ${error}")
                 GithubResponseApi(0, false, listOf())
             }
             .subscribe(this::handleResponse, this::onError)
     }
 
     private fun onError(error: Throwable) {
-        Log.e(RX_JAVA_TAG, "onError received: ${error}")
+        Log.e(ContentValues.TAG, "onError received: ${error}")
     }
 
-    private fun handleResponse(GithubResponseApi: GithubResponseApi) {
+    private fun handleResponse(repositoryResponse: GithubResponseApi) {
 
-        Log.d(RX_JAVA_TAG, "Size of composite disposable stream and rest api from github: " + GithubResponseApi.items.size)
+        Log.d(ContentValues.TAG, "Size of composite disposable stream and rest api from github: " + repositoryResponse.items.size)
         var reposResult = ""
-        GithubResponseApi.items.forEach { repos ->
+        repositoryResponse.items.forEach { repos ->
             reposResult += "Name of repository: " + repos.name + "\n"
         }
         val currectText = binding?.tvCompositeDisposableValue?.text.toString()
@@ -259,7 +240,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         val intervalObservable = Observable
             .interval(1, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
-            .takeWhile(object : Predicate<Long> {
+            .takeWhile(object : Predicate<Long?> {
                 // stop the process if more than 5 seconds passes
                 @Throws(java.lang.Exception::class)
                 override fun test(longNumber: Long): Boolean {
@@ -268,16 +249,16 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
             })
             .observeOn(AndroidSchedulers.mainThread())
 
-        intervalObservable.subscribe(object : Observer<Long> {
+        intervalObservable.subscribe(object : io.reactivex.Observer<Long?> {
             override fun onSubscribe(d: Disposable) {}
             override fun onNext(aLong: Long) {
-                Log.d(RX_JAVA_TAG, "AAAA onNext: interval: $aLong")
+                Log.d(ContentValues.TAG, "AAAA onNext: interval: $aLong")
             }
 
             override fun onComplete() {}
 
             override fun onError(e: Throwable) {
-                Log.e(RX_JAVA_TAG, "error: $e")
+                Log.e(ContentValues.TAG, "error: $e")
             }
         })
 
@@ -289,7 +270,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         animalsObservable
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .map { name -> name.uppercase() }
+            .map { name -> name.toUpperCase() }
             .subscribe(animalObserver)
 
 
@@ -298,32 +279,32 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
             .map { i: Int -> i * i }
             .filter { i: Int -> i > 10 }
             .subscribe { x: Int? ->
-                Log.d(RX_JAVA_TAG, "Numbers greather than 10 are: " + x)
+                Log.d(ContentValues.TAG, "Numbers greather than 10 are: " + x)
                 println(x) }
     }
 
-    private fun getAnimalsObserver(): Observer<String> {
-        return object : Observer<String> {
+    private fun getAnimalsObserver(): io.reactivex.Observer<String?> {
+        return object : io.reactivex.Observer<String?> {
 
             override fun onNext(s: String) {
-                Log.d(RX_JAVA_TAG, "Name: $s")
+                Log.d(ContentValues.TAG, "Name: $s")
             }
 
             override fun onError(e: Throwable) {
                 Log.e(
-                    RX_JAVA_TAG,
+                    ContentValues.TAG,
                     "onError: " + e.message
                 )
             }
 
             override fun onComplete() {
                 Log.d(
-                    RX_JAVA_TAG,
+                    ContentValues.TAG,
                     "All items are emitted!"
                 )
             }
             override fun onSubscribe(d: Disposable) {
-                Log.d(RX_JAVA_TAG, "onSubscribe")
+                Log.d(ContentValues.TAG, "onSubscribe")
             }
         }
     }
@@ -342,7 +323,6 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
             }
         }
     }
-
 
 
 }
