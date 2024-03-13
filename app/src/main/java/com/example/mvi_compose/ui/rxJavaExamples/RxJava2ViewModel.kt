@@ -7,7 +7,7 @@ import com.example.mvi_compose.movies.di.github.GithubNetwork
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import com.example.mvi_compose.movies.repositories.GithubRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
 

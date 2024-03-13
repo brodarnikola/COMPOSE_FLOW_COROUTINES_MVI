@@ -46,10 +46,6 @@ class ReposRxJava2FlatMapAdapter :
 
     fun updatePost(post: Post) {
         val position = posts.indexOf(post)
-        Log.d("rxjavatag", "size is: ${posts.size}")
-        Log.d("rxjavatag", "post size is: ${post.comments.size}")
-        Log.d("rxjavatag", "comments is: ${post.comments}")
-//        posts[position] = posts.set(position, post)
         posts.set(position, post)
         notifyItemChanged(posts.indexOf(post))
     }

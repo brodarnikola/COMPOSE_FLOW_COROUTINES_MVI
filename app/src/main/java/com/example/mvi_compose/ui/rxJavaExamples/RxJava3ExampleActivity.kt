@@ -15,19 +15,19 @@ import com.example.mvi_compose.databinding.Rxjava2TutorialBinding
 import com.example.mvi_compose.movies.network.GithubApi
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Observable
-import io.reactivex.ObservableSource
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Predicate
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableSource
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Predicate
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import kotlin.jvm.Throws
@@ -110,8 +110,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
                 getCommentsObservable(posts)
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : io.reactivex.Observer<Post> {
-
+            .subscribe(object : Observer<Post> {
 
                 override fun onComplete() {}
 
@@ -135,15 +134,16 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
             .getPosts( )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .flatMap( object : io.reactivex.functions.Function< List<Post> , ObservableSource<Post>> {
-                //@Throws
-                override fun apply( posts: List<Post> ) : ObservableSource<Post>  {
+            // flatmap will take each object from list and convert it to observable ..
+            // then latter we can use this observable to create new backend rest api call
+            // flatmap does not garanty that it will take object in the same order, as there are in list
+            //  in rxJava2 .flatMap( object : io.reactivex.functions.Function< List<Post> , ObservableSource<Post>> {
+            .flatMap { posts: List<Post> ->
                     adapter?.setPosts(posts.toMutableList())
-                    return Observable.fromIterable(posts)
+                    Observable.fromIterable(posts)
                         .subscribeOn(Schedulers.io())
-                }
-            })
-            .onErrorReturn { error ->
+            }
+            .onErrorReturn { error: Throwable ->
                 Log.e(ContentValues.TAG, "onError received: ${error}")
                 Post()
             }
@@ -153,7 +153,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
     private fun getCommentsObservable(post: Post) : Observable<Post> {
         val resultPostComments = setupRetrofitFlatMap()
             .getComments( post.id )
-            .map { comments ->
+            .map { comments: List<Comment> ->
 
                 val delay: Int = (java.util.Random().nextInt(3) + 1) * 1000 // sleep thread for x ms
 
@@ -175,7 +175,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
 
             }
             .subscribeOn(Schedulers.io())
-            .onErrorReturn { error ->
+            .onErrorReturn { error: Throwable ->
                 Log.e(ContentValues.TAG, "onError received: ${error}")
                 Post()
             }
@@ -187,7 +187,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         return Retrofit.Builder()
             .baseUrl("https://jsonplaceholder.typicode.com/")
             .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .build().create(GithubApi::class.java)
     }
 
@@ -208,12 +208,12 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         )
     }
 
-    private fun searchGithubRepos( sizeOfGithubRepos: Int): Disposable? {
+    private fun searchGithubRepos( sizeOfGithubRepos: Int): Disposable {
         // this is a single example of rxjava2 for github repositories
         return  viewModel.getGithubRepositories("java", 1, sizeOfGithubRepos)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .onErrorReturn { error ->
+            .onErrorReturn { error: Throwable ->
                 Log.e(ContentValues.TAG, "onError received: ${error}")
                 GithubResponseApi(0, false, listOf())
             }
@@ -240,7 +240,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         val intervalObservable = Observable
             .interval(1, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
-            .takeWhile(object : Predicate<Long?> {
+            .takeWhile(object : Predicate<Long> {
                 // stop the process if more than 5 seconds passes
                 @Throws(java.lang.Exception::class)
                 override fun test(longNumber: Long): Boolean {
@@ -249,7 +249,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
             })
             .observeOn(AndroidSchedulers.mainThread())
 
-        intervalObservable.subscribe(object : io.reactivex.Observer<Long?> {
+        intervalObservable.subscribe(object : Observer<Long> {
             override fun onSubscribe(d: Disposable) {}
             override fun onNext(aLong: Long) {
                 Log.d(ContentValues.TAG, "AAAA onNext: interval: $aLong")
@@ -270,7 +270,7 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
         animalsObservable
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .map { name -> name.toUpperCase() }
+            .map { name -> name.uppercase() }
             .subscribe(animalObserver)
 
 
@@ -283,8 +283,8 @@ class RxJava3ExampleActivity : AppCompatActivity() { // AppCompatActivity() {
                 println(x) }
     }
 
-    private fun getAnimalsObserver(): io.reactivex.Observer<String?> {
-        return object : io.reactivex.Observer<String?> {
+    private fun getAnimalsObserver(): Observer<String> {
+        return object : Observer<String> {
 
             override fun onNext(s: String) {
                 Log.d(ContentValues.TAG, "Name: $s")

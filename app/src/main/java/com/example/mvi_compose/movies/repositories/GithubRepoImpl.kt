@@ -9,8 +9,8 @@ import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
 import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
 import com.squareup.moshi.Moshi
-import io.reactivex.Flowable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -11,34 +11,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tvConverTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginEnd="8dp"
-                android:text="Rxjava2 -> Convert flowable api response to livedata example"
-                android:textAlignment="textStart"
-                android:textSize="17sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-            <TextView
-                android:id="@+id/tvConvertFlowableToLiveData"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginEnd="8dp"
-                android:text="1"
-                android:textAlignment="center"
-                android:textSize="17sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvConverTitle" />
 
 
 
@@ -54,7 +26,7 @@
                 android:textSize="17sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvConvertFlowableToLiveData" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvCompositeDisposableValue"
@@ -84,23 +56,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvCompositeDisposableValue" />
 
-            <Button
-                android:id="@+id/btnSwitchMap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SWITCH MAP EXMAPLE"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvNumberIncreaseAutomatically" />
-            <!--            app:spanCount="@integer/grid_columns"-->
-
             <View
                 android:id="@+id/viewSeparator"
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
                 android:layout_marginTop="7dp"
                 android:background="@color/teal_700"
-                app:layout_constraintTop_toBottomOf="@+id/btnSwitchMap" />
+                app:layout_constraintTop_toBottomOf="@+id/tvNumberIncreaseAutomatically" />
 
             <TextView
                 android:id="@+id/tvFlatMapExample"
@@ -119,7 +81,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/listReposFlatMap"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="450dp"
                 android:clipToPadding="false"
                 android:paddingEnd="@dimen/card_side_margin"
                 android:paddingStart="@dimen/card_side_margin"
