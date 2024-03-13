@@ -13,6 +13,7 @@ object MainDestinations {
     const val LOCATION = "Location"
     const val SETTINGS = "Settings"
     const val MOVIE_DETAILS = "MovieDetails"
+    const val RX_JAVA_EXAMPLES = "RxJavaExamples"
 }
 
 object NavArguments {

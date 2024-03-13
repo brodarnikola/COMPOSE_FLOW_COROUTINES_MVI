@@ -6,10 +6,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -43,6 +45,7 @@ import com.example.mvi_compose.ui.alerts.AlertsScreen
 import com.example.mvi_compose.ui.github_location.GithubLocationScreen
 import com.example.mvi_compose.ui.movies.MovieDetailsScreen
 import com.example.mvi_compose.ui.movies.MoviesScreen
+import com.example.mvi_compose.ui.rxJavaExamples.RxJava3ExamplesScreeen
 import com.example.mvi_compose.ui.settings.SettingsScreen
 
 data class BottomNavigationBarItem(
@@ -80,9 +83,15 @@ fun bottomNavigationItems(): List<BottomNavigationBarItem> {
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )
+    val rxJavaExamples = BottomNavigationBarItem(
+        title = "RxJavaExamples",
+        route =  MainDestinations.RX_JAVA_EXAMPLES,
+        selectedIcon = Icons.Filled.AccountBox,
+        unselectedIcon = Icons.Outlined.AccountBox
+    )
 
     // creating a list of all the tabs
-    val tabBarItems = listOf(homeTab, alertsTab, locationTab,settingsTab)
+    val tabBarItems = listOf(homeTab, alertsTab, locationTab,settingsTab, rxJavaExamples)
     return tabBarItems
 }
 
@@ -177,6 +186,12 @@ fun NavGraphBuilder.mainNavGraph(
     composable(MainDestinations.LOCATION) {
         GithubLocationScreen(viewModel = hiltViewModel())
     }
+    // Here on this screen, can I please explain what is happening, how rxjava2 is working and functining with observable, observer and operators
+    // https://github.com/amitshekhariitbhu/RxJava2-Android-Samples/blob/master/app/src/main/java/com/rxjava2/android/samples/ui/networking/NetworkingActivity.java
+    composable(MainDestinations.RX_JAVA_EXAMPLES) {
+        RxJava3ExamplesScreeen()
+    }
+
 }
 
 

@@ -7,7 +7,10 @@ import com.example.mvi_compose.movies.network.ApiError
 import com.example.mvi_compose.movies.network.GithubApi
 import com.example.mvi_compose.movies.network.NetworkResult
 import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
+import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
 import com.squareup.moshi.Moshi
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -77,6 +80,16 @@ class GithubRepoImpl @Inject constructor(
         }
 
         return@withContext networkResult
+    }
+
+    override fun getSearchRepositorieRxJava2(query: String, page: Int, perPage: Int): Single<GithubResponseApi> {
+        val repos = service.searchGithubRepositoryWithRxJava2(query, page, perPage)
+        return repos
+    }
+
+    override fun getSearchRepositorieWithFlowableRxJava2(query: String): Flowable<GithubResponseApi> {
+        val repositoryResult = service.searchGithubRepositoryWithFlowable(query, 1, 10)
+        return repositoryResult
     }
 
     private suspend fun <T : Any> handleNetworkRequest(apiCall: suspend () -> Response<T>): NetworkResult<T> {

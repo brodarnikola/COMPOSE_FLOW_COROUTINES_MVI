@@ -31,6 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.rxJavaExamples.RxJava3ExampleActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MVI_Compose">
+        </activity>
     </application>
 
 </manifest>
