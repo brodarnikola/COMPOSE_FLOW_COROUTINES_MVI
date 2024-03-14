@@ -2,7 +2,16 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="CalculatorInstrumentationTest">
+        <State />
+      </entry>
+      <entry key="LogHistoryAndroidUnitTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="testAppliationClass()">
         <State />
       </entry>
     </value>

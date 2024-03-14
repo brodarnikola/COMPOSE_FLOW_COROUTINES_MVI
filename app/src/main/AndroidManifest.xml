@@ -37,6 +37,11 @@
             android:exported="true"
             android:theme="@style/Theme.MVI_Compose">
         </activity>
+
+        <activity
+            android:name=".unitTesting.CalculatorActivity"
+            android:exported="true" >
+        </activity>
     </application>
 
 </manifest>
