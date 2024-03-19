@@ -26,11 +26,11 @@ class AlertsViewModel @Inject constructor(
 
     override fun onEvent(event: AlertContract.AlertsEvents) {
         when(event) {
-            is AlertContract.AlertsEvents.initGetAllRepositories -> {
-                getAllRepositories("android") // searchText = android
-            }
             is AlertContract.AlertsEvents.getAgainAllRepositories -> {
                 getAllRepositories(event.searchText) // searchText = iOS
+            }
+            AlertContract.AlertsEvents.initGetAllRepositories -> {
+                getAllRepositories("android")
             }
         }
     }

@@ -68,13 +68,11 @@ class MovieViewModel @Inject constructor(
                                 }
                             }
 
-                            withContext(Dispatchers.IO) {
                                 if (movieDao.fetchFavouriteMovies().isEmpty()) {
                                     result.data.results.forEach { movie ->
                                         movieDao.insertMovie(movie)
                                     }
                                 }
-                            }
 
                             val listFetchImages = mutableListOf<Deferred<Unit>>()
                             result.data.results.forEachIndexed { index, _ ->
