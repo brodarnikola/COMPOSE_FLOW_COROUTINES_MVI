@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
             }
         }
     }
+
 }
 
 //@Preview(showBackground = true)
