@@ -16,7 +16,6 @@ class MainActivity : ComponentActivity() { // AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             MVI_ComposeTheme {
                 MainComposeApp()
                 // A surface container using the 'background' color from the theme
