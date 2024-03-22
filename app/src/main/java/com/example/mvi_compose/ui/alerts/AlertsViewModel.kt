@@ -37,7 +37,8 @@ class AlertsViewModel @Inject constructor(
     ) { state, isNetworkConnected ->
         Log.d("MutableState", "isNetworkConnected: ${isNetworkConnected}")
         Log.d("MutableState", "isNetworkConnectedFlow: ${networkConnectionStatusManager.isNetworkConnectedFlow.value}")
-        state.copy(isNetworkConnected = isNetworkConnected)
+        val networkState = state.copy(isNetworkConnected = isNetworkConnected)
+        networkState
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), NetworkConnectionStatusState())
 
     init {
