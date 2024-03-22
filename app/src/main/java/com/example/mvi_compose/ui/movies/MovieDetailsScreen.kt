@@ -32,9 +32,9 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
-import com.example.mvi_compose.movies.network.data.movie.Trailer
+import com.example.mvi_compose.general.network.data.movie.Trailer
 import com.example.mvi_compose.R
-import com.example.mvi_compose.movies.utils.AppConstants
+import com.example.mvi_compose.general.utils.AppConstants
 
 @Composable
 fun MovieDetailsScreen(
@@ -286,7 +286,7 @@ fun MovieDetailsPreview() {
 //            original_title = "",
 //            popularity = 88.5,
 //            video = true,
-//            overview = "Spiderman movies is about man turning into a spider which can fly and attack bad people falling them dead",
+//            overview = "Spiderman general is about man turning into a spider which can fly and attack bad people falling them dead",
 //        ),
 //        trailers = arrayListOf(
 //            Trailer(id = "1", name = "spiderman intro", key = ""),

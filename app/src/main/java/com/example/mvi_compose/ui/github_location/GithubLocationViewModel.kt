@@ -2,10 +2,10 @@ package com.example.mvi_compose.ui.github_location
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.di.github.GithubNetwork
-import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
-import com.example.mvi_compose.movies.repositories.GithubRepo
-import com.example.mvi_compose.movies.repositories.LocationRepo
+import com.example.mvi_compose.general.di.github.GithubNetwork
+import com.example.mvi_compose.general.network.data.github.RepositoryDetails
+import com.example.mvi_compose.general.repositories.GithubRepo
+import com.example.mvi_compose.general.repositories.LocationRepo
 import com.example.mvi_compose.ui.BaseViewModel
 import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel

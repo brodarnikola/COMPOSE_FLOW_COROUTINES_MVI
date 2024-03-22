@@ -12,12 +12,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.mvi_compose.R
 import com.example.mvi_compose.databinding.Rxjava2TutorialBinding
-import com.example.mvi_compose.movies.network.GithubApi
-import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
+import com.example.mvi_compose.general.network.GithubApi
+import com.example.mvi_compose.general.network.data.github.GithubResponseApi
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.ObservableSource
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -31,7 +30,6 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import kotlin.jvm.Throws
-import kotlin.random.Random
 
 
 private const val UPDATE_PERIOD = 10000L

@@ -1,14 +1,13 @@
 package com.example.mvi_compose.ui.movies
 
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.network.data.movie.Trailer
-import com.example.mvi_compose.movies.repositories.MovieRepo
-import com.example.mvi_compose.movies.network.data.movie.Movie
-import com.example.mvi_compose.movies.network.NetworkResult
-import com.example.mvi_compose.movies.network.data.movie.TrailerResponseMapper
+import com.example.mvi_compose.general.network.data.movie.Trailer
+import com.example.mvi_compose.general.repositories.MovieRepo
+import com.example.mvi_compose.general.network.data.movie.Movie
+import com.example.mvi_compose.general.network.NetworkResult
+import com.example.mvi_compose.general.network.data.movie.TrailerResponseMapper
 import com.example.mvi_compose.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -19,7 +18,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.immutableListOf
 import javax.inject.Inject
 
 @HiltViewModel

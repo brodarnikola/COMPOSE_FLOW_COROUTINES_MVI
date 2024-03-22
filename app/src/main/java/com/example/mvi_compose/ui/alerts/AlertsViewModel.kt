@@ -2,9 +2,9 @@ package com.example.mvi_compose.ui.alerts
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.network.NetworkResult
-import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
-import com.example.mvi_compose.movies.repositories.GithubRepoImpl
+import com.example.mvi_compose.general.network.NetworkResult
+import com.example.mvi_compose.general.network.data.github.RepositoryDetails
+import com.example.mvi_compose.general.repositories.GithubRepoImpl
 import com.example.mvi_compose.ui.Resource
 import com.example.mvi_compose.ui.SecondBaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

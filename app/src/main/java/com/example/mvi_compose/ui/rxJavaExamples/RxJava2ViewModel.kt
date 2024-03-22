@@ -1,11 +1,10 @@
 package com.example.mvi_compose.ui.rxJavaExamples
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.mvi_compose.movies.di.github.GithubNetwork
-import com.example.mvi_compose.movies.network.data.github.GithubResponseApi
-import com.example.mvi_compose.movies.repositories.GithubRepo
+import com.example.mvi_compose.general.di.github.GithubNetwork
+import com.example.mvi_compose.general.network.data.github.GithubResponseApi
+import com.example.mvi_compose.general.repositories.GithubRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject

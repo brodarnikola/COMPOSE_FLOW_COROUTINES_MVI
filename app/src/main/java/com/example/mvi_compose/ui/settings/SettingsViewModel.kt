@@ -1,11 +1,10 @@
 package com.example.mvi_compose.ui.settings
 
 import android.util.Log
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.network.NetworkResult
-import com.example.mvi_compose.movies.network.data.github.RepositoryDetails
-import com.example.mvi_compose.movies.repositories.GithubRepoImpl
+import com.example.mvi_compose.general.network.NetworkResult
+import com.example.mvi_compose.general.network.data.github.RepositoryDetails
+import com.example.mvi_compose.general.repositories.GithubRepoImpl
 import com.example.mvi_compose.ui.BaseViewModel
 import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel

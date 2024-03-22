@@ -5,11 +5,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
-import com.example.mvi_compose.movies.network.data.movie.Movie
-import com.example.mvi_compose.movies.repositories.MovieRepoImpl
-import com.example.mvi_compose.movies.network.NetworkResult
-import com.example.mvi_compose.movies.utils.AppConstants.Companion.REST_API_CALL
-import com.example.mvi_compose.movies.utils.MovieDao
+import com.example.mvi_compose.general.network.data.movie.Movie
+import com.example.mvi_compose.general.repositories.MovieRepoImpl
+import com.example.mvi_compose.general.network.NetworkResult
+import com.example.mvi_compose.general.utils.AppConstants.Companion.REST_API_CALL
+import com.example.mvi_compose.general.utils.MovieDao
 import com.example.mvi_compose.ui.BaseViewModel
 import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,7 +99,7 @@ class MovieViewModel @Inject constructor(
                                 )
                             }
                             listFetchImages.awaitAll()        //
-                            sendUiEvent(UiEffect.ShowToast("Fetched all movies"))
+                            sendUiEvent(UiEffect.ShowToast("Fetched all general"))
                         }
                     }
                 }

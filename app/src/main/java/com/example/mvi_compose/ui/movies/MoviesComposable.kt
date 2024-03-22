@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.example.mvi_compose.BuildConfig
-import com.example.mvi_compose.movies.network.data.movie.Movie
+import com.example.mvi_compose.general.network.data.movie.Movie
 import com.example.mvi_compose.ui.theme.PurpleGrey40
 import com.example.mvi_compose.R
 import com.example.mvi_compose.ui.UiEffect
@@ -139,7 +139,7 @@ fun MoviesListPreview() {
 //        original_title = "",
 //        popularity = 88.5,
 //        video = true,
-//        overview = "Spiderman movies is about man turning into a spider which can fly and attack bad people falling them dead",
+//        overview = "Spiderman general is about man turning into a spider which can fly and attack bad people falling them dead",
 //        random_delay = 0L
 //    )
 //    MVIComposeSampleTheme {

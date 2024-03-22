@@ -1,7 +1,7 @@
 package com.example.mvi_compose.ui.settings
 
 import android.util.Log
-import com.example.mvi_compose.movies.di.IODispatcher
+import com.example.mvi_compose.general.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
