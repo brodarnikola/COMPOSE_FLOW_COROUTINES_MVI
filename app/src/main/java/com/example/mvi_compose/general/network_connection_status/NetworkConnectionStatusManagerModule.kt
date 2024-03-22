@@ -18,7 +18,7 @@ object NetworkConnectionStatusManagerModule {
     @Singleton
     @Provides
     fun provideCoroutineScope(): CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        CoroutineScope(SupervisorJob() + Dispatchers.IO)
     @Provides
     @Singleton
     fun provideNetworkConnectionStatusManager(
