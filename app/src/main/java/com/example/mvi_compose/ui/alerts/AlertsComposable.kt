@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.mvi_compose.network.network_connection_status.NetworkConnectionStatusManagerUi
 import com.example.mvi_compose.ui.Resource
 import com.example.mvi_compose.ui.github_location.ScrollToTopButton
 import com.example.mvi_compose.ui.movies.ErrorScreen
@@ -57,14 +58,16 @@ fun AlertsScreen(viewModel: AlertsViewModel) {
     when(viewModel.state.value) {
         is Resource.Error -> ErrorScreen(error = alertsState.error)
         is Resource.Loading -> LoadingScreen()
-        is Resource.Success -> GithubListScreen(alertsState = alertsState) { searchText ->
+        is Resource.Success -> GithubListScreen(viewModel = viewModel) { searchText ->
             viewModel.onEvent(AlertContract.AlertsEvents.getAgainAllRepositories(searchText))
         }
     }
 }
 
 @Composable
-fun GithubListScreen(alertsState: AlertContract.AlertState, getAgainAllRepositories: (searchText: String) -> Unit ) {
+fun GithubListScreen(viewModel: AlertsViewModel, getAgainAllRepositories: (searchText: String) -> Unit ) {
+
+    val alertsState = viewModel.state.value.unwrap() ?: AlertContract.AlertState()
     val githubList = remember { alertsState.repositoryList }
     val githubListState = rememberLazyListState()
 
@@ -72,6 +75,15 @@ fun GithubListScreen(alertsState: AlertContract.AlertState, getAgainAllRepositor
     val coroutineScope = rememberCoroutineScope()
 
     Column {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            NetworkConnectionStatusManagerUi(viewModel = viewModel)
+        }
 
         Row(
             modifier = Modifier
@@ -92,7 +104,6 @@ fun GithubListScreen(alertsState: AlertContract.AlertState, getAgainAllRepositor
                     text = "Click"
                 )
             }
-
         }
 
         Log.d("GITHUB", "githubResponseApi draw data is 1: ${githubList}")

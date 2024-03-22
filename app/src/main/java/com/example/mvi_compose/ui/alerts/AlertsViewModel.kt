@@ -5,20 +5,46 @@ import androidx.lifecycle.viewModelScope
 import com.example.mvi_compose.general.network.NetworkResult
 import com.example.mvi_compose.general.network.data.github.RepositoryDetails
 import com.example.mvi_compose.general.repositories.GithubRepoImpl
+import com.example.mvi_compose.network.network_connection_status.NetworkConnectionStatusManager
+import com.example.mvi_compose.network.network_connection_status.NetworkConnectionStatusState
 import com.example.mvi_compose.ui.Resource
 import com.example.mvi_compose.ui.SecondBaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class AlertsViewModel @Inject constructor(
-    private val githubRepo: GithubRepoImpl
+    private val githubRepo: GithubRepoImpl,
+    private val networkConnectionStatusManager: NetworkConnectionStatusManager
 ) : SecondBaseViewModel<AlertContract.AlertState, AlertContract.AlertsEvents>() {
+
+    var effects = Channel<AlertContract.Effect>(UNLIMITED)
+        private set
+
+    private val _networkState = MutableStateFlow(NetworkConnectionStatusState())
+
+    val networkState = _networkState.combine(
+        networkConnectionStatusManager.isNetworkConnectedFlow
+    ) { state, isNetworkConnected ->
+        Log.d("MutableState", "isNetworkConnected: ${isNetworkConnected}")
+        Log.d("MutableState", "isNetworkConnectedFlow: ${networkConnectionStatusManager.isNetworkConnectedFlow.value}")
+        state.copy(isNetworkConnected = isNetworkConnected)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), NetworkConnectionStatusState())
+
+    init {
+        Log.d("MutableState", "_state.value is 00: ${_state.value}")
+        networkConnectionStatusManager.startListenNetworkState()
+        onEvent(AlertContract.AlertsEvents.initGetAllRepositories)
+    }
 
     override fun initialState(): AlertContract.AlertState {
         return AlertContract.AlertState()
@@ -33,14 +59,6 @@ class AlertsViewModel @Inject constructor(
                 getAllRepositories("android")
             }
         }
-    }
-
-    var effects = Channel<AlertContract.Effect>(UNLIMITED)
-        private set
-
-    init {
-        Log.d("MutableState", "_state.value is 00: ${_state.value}")
-        onEvent(AlertContract.AlertsEvents.initGetAllRepositories)
     }
 
     private fun getAllRepositories(searchText: String) {
@@ -70,6 +88,11 @@ class AlertsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        networkConnectionStatusManager.stopListenNetworkState()
     }
 }
 
