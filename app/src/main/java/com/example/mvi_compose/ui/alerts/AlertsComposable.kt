@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -31,12 +32,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.example.mvi_compose.network.network_connection_status.NetworkConnectionStatusManagerUi
 import com.example.mvi_compose.ui.Resource
 import com.example.mvi_compose.ui.github_location.ScrollToTopButton
 import com.example.mvi_compose.ui.movies.ErrorScreen
 import com.example.mvi_compose.ui.movies.LoadingScreen
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -47,6 +53,26 @@ fun AlertsScreen(viewModel: AlertsViewModel) {
     val alertsState = viewModel.state.value.unwrap() ?: AlertContract.AlertState()
     val context = LocalContext.current
 
+    val  lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect( LocalLifecycleOwner.current) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+            } else if (event == Lifecycle.Event.ON_STOP) {
+                viewModel.stopListenNetworkState()
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
     LaunchedEffect(Unit) {
         viewModel.effects.receiveAsFlow().collect { event ->
             when (event) {

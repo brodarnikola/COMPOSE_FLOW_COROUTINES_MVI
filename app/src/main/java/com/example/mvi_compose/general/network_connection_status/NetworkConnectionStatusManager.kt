@@ -18,8 +18,6 @@ interface NetworkConnectionStatusManager {
      */
     val isNetworkConnectedFlow: StateFlow<Boolean?>
 
-    val isNetworkConnected: Boolean
-
     fun startListenNetworkState()
 
     fun stopListenNetworkState()
@@ -44,9 +42,6 @@ class NetworkConnectionStatusManagerImpl(
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = null
             )
-
-    override val isNetworkConnected: Boolean
-        get() = isNetworkConnectedFlow.value ?: false
 
     override fun startListenNetworkState() {
         if (_currentNetwork.value.isListening) {

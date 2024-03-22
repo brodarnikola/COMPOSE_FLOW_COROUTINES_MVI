@@ -39,12 +39,17 @@ class AlertsViewModel @Inject constructor(
         Log.d("MutableState", "isNetworkConnectedFlow: ${networkConnectionStatusManager.isNetworkConnectedFlow.value}")
         val networkState = state.copy(isNetworkConnected = isNetworkConnected)
         networkState
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), NetworkConnectionStatusState())
+    } .stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), NetworkConnectionStatusState())
 
     init {
         Log.d("MutableState", "_state.value is 00: ${_state.value}")
         networkConnectionStatusManager.startListenNetworkState()
         onEvent(AlertContract.AlertsEvents.initGetAllRepositories)
+    }
+
+    fun stopListenNetworkState() {
+        Log.d("Mutable state", "clear view mode 22")
+        networkConnectionStatusManager.stopListenNetworkState()
     }
 
     override fun initialState(): AlertContract.AlertState {
@@ -89,11 +94,6 @@ class AlertsViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        networkConnectionStatusManager.stopListenNetworkState()
     }
 }
 
