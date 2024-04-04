@@ -92,8 +92,11 @@ class MovieViewModel @Inject constructor(
                                         )
 
                                         withContext(Dispatchers.Main) {
-                                            _state.value.movies[index] =
-                                                _state.value.movies[index].copy(random_delay = random.toLong())
+                                            _state.value.movies[index] = _state.value.movies[index].copy(random_delay = random.toLong())
+//                                            _state.update { it.copy( movies = _state.value.movies
+//                                            ) }
+                                           /* _state.value.movies[index] =
+                                                _state.value.movies[index].copy(random_delay = random.toLong())*/
                                         }
                                     }
                                 )
@@ -115,7 +118,7 @@ sealed class MovieEvent {
 data class MovieState(
     val count: Int = 0,
 
-    val movies: SnapshotStateList<Movie> = mutableStateListOf(),
+    val movies: MutableList<Movie> = mutableListOf(), // SnapshotStateList<Movie> = mutableStateListOf(),
 
     val loading: Boolean = false,
     val error: String = ""

@@ -123,7 +123,12 @@ class MovieDetailsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val movieData = repository.getMovieById(movieId)
             withContext(Dispatchers.Main) {
-                _state.update { it.copy(isLiked = if(movieData.isLiked != null ) movieData.isLiked == true else false) }
+                _state.update {
+                    var movieDetailsState: MovieDetailsState = it
+                    if(it.movie != null)
+                        movieDetailsState = it.copy(isLiked = if(movieData.isLiked != null ) movieData.isLiked == true else false)
+                    movieDetailsState
+              }
             }
         }
     }

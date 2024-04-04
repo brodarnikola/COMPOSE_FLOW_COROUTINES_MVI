@@ -9,7 +9,9 @@ import com.example.mvi_compose.ui.BaseViewModel
 import com.example.mvi_compose.ui.UiEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Delay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.update
@@ -28,14 +30,25 @@ class SettingsViewModel @Inject constructor(
         return SettingsState()
     }
 
+    private var job: Job? = null
+
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        job?.cancel()
+        job = viewModelScope.launch(Dispatchers.IO) {
+            delay(3000)
             sharedFlowExample.githubFlow.collectIndexed { index, _ ->
 
                 Log.d("Shared flow", "Shared flow trigerred index: $index")
                 onEvent(SettingsEvent.FetchAllGithubData)
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        Log.d("Shared flow", "Clear, exit function isActive ${job?.isActive}")
+        Log.d("Shared flow", "Clear, exit function isCompleted ${job?.isCompleted}")
     }
 
     override fun onEvent(event: SettingsEvent) {

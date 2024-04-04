@@ -70,7 +70,7 @@ fun MoviesListScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(
-            items = finalMovieList.toList() ,
+            items = finalMovieList, // moviesState.movies, // finalMovieList.toList() ,
             key = { movie ->
                 // Return a stable, unique key for the movie
                 movie.id

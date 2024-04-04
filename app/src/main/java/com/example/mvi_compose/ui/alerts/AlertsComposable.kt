@@ -59,8 +59,7 @@ fun AlertsScreen(viewModel: AlertsViewModel) {
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-            } else if (event == Lifecycle.Event.ON_STOP) {
+            if (event == Lifecycle.Event.ON_STOP) {
                 viewModel.stopListenNetworkState()
             }
         }
