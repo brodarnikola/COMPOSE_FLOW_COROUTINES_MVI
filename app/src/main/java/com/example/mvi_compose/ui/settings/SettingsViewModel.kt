@@ -47,6 +47,8 @@ class SettingsViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
 
+        job?.cancel()
+        Log.d("Shared flow", "Prevent memory leaks.. cancel coroutines if user exit screen, before the shared flow is done")
         Log.d("Shared flow", "Clear, exit function isActive ${job?.isActive}")
         Log.d("Shared flow", "Clear, exit function isCompleted ${job?.isCompleted}")
     }

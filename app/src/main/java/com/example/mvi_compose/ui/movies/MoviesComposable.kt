@@ -76,11 +76,47 @@ fun MoviesListScreen(
                 movie.id
             }
         ) { movie ->
-            Log.d("MOVIE_ID", "Movie id is 99: ${onMovieClick}")
-                MovieItem(movie, onMovieClick)
+
+            val backgroundColor = colorResource( R.color.teal_700)
+            Log.d("MOVIE_ID", "Recompose movie id is 1: ${movie.id.toLong()}")
+            Column(
+//        shape = RoundedCornerShape(8.dp),
+//        elevation = 7.dp,
+                modifier = Modifier
+                    .height(150.dp)
+                    .wrapContentWidth()
+                    .drawBehind {
+                        drawRect(color = backgroundColor)
+                    }
+                    .clickable(onClick = {
+                        Log.d("MOVIE_ID", "Movie id is 11: ${movie.id}")
+                        onMovieClick(movie.id.toLong())
+                    })
+            ) {
+                MovieImage(movie.poster_path, movie.id)
+                MovieText(movie.random_delay)
+            }
         }
     }
 }
+
+@Composable
+fun MovieImage(posterPath: String?, movieId: Int) {
+    Log.d("MOVIE_ID", "Recompose movie id is 2: ${movieId.toLong()}")
+    Image(
+        painter = rememberAsyncImagePainter(model = "${BuildConfig.IMAGE_URL}${posterPath}"),
+        contentDescription = "Awesome image_${movieId}",
+        modifier = Modifier
+            .size(100.dp)
+    )
+}
+
+@Composable
+fun MovieText(randomDelay: Long) {
+    Log.d("MOVIE_ID", "Recompose movie id is 3 : ${randomDelay}")
+    Text(text = "Random delay: ${randomDelay}", modifier = Modifier.padding(10.dp) )
+}
+
 
 @Composable
 fun MovieItem(movie: Movie, onMovieClick: (id: Long) -> Unit) {
