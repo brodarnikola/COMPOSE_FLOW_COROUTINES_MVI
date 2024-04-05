@@ -25,6 +25,7 @@ import com.example.mvi_compose.ui.github_location.GithubLocationViewModel
 
 @Composable
 fun MachineLearningRxJava3(
+    goToAnimatedCreditCard: () -> Unit,
     goToMachineLearning: () -> Unit,
     goToRxJava3Examples: () -> Unit
 ) {
@@ -37,6 +38,22 @@ fun MachineLearningRxJava3(
     ) {
 
         Text(text = "Other possibilities to explore, to see it", modifier = Modifier.padding(vertical = 10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
+                .clickable {
+                    goToAnimatedCreditCard()
+                },
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(text = "Very nice animated, rotated credit card")
+            Image(
+                modifier = Modifier.size(30.dp),
+                contentDescription = "",
+                painter = painterResource(
+                    id =  R.drawable.like
+                )
+            )
+        }
         Row(
             modifier = Modifier.fillMaxWidth().padding(10.dp)
                 .clickable {

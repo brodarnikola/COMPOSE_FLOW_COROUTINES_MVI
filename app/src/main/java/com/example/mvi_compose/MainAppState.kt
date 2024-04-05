@@ -16,6 +16,7 @@ object MainDestinations {
     const val ANDROID_POSSIBILITIES = "Android possibilities"
     const val RX_JAVA_EXAMPLES = "RxJavaExamples"
     const val OBJECT_DETECTION = "ObjectDetection"
+    const val ANIMATED_CARD = "AnimatedCard"
 }
 
 object NavArguments {
@@ -58,16 +59,20 @@ class MainAppState(
         }
     }
 
+    fun navigateToAnimatedCreditCard(route: String) {
+        if (route != currentRoute) {
+            navController.navigate(route) {
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
+
     fun navigateToMachineLearning(route: String) {
         if (route != currentRoute) {
             navController.navigate(route) {
                 launchSingleTop = true
                 restoreState = true
-//                if (popPreviousScreen) {
-//                    popUpTo(navController.currentBackStackEntry?.destination?.route ?: return@navigate) {
-//                        inclusive = true
-//                    }
-//                }
             }
         }
     }
@@ -77,11 +82,6 @@ class MainAppState(
             navController.navigate(route) {
                 launchSingleTop = true
                 restoreState = true
-//                if (popPreviousScreen) {
-//                    popUpTo(navController.currentBackStackEntry?.destination?.route ?: return@navigate) {
-//                        inclusive = true
-//                    }
-//                }
             }
         }
     }

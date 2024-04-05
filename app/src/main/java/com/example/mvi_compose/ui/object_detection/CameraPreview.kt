@@ -1,4 +1,4 @@
-package com.example.mvi_compose.ui
+package com.example.mvi_compose.ui.object_detection
 
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView

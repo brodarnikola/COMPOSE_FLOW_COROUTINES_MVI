@@ -43,6 +43,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.mvi_compose.ui.MachineLearningRxJava3
 import com.example.mvi_compose.ui.alerts.AlertsScreen
+import com.example.mvi_compose.ui.animated_card.AnimatedCard
 import com.example.mvi_compose.ui.github_location.GithubLocationScreen
 import com.example.mvi_compose.ui.movies.MovieDetailsScreen
 import com.example.mvi_compose.ui.movies.MoviesScreen
@@ -140,6 +141,9 @@ fun MainComposeApp(
             ) {
                 mainNavGraph(
                     navBackStackEntry = navBackStackEntry,
+                    goToAnimatedCreditCard =  { route ->
+                        appState.navigateToAnimatedCreditCard(route = route)
+                    },
                     goToMovieDetails =  { route, movieId ->
                         appState.navigateToMovieDetails(route = route, movieId = movieId)
                     },
@@ -161,6 +165,7 @@ fun MainComposeApp(
 fun NavGraphBuilder.mainNavGraph(
     navBackStackEntry: State<NavBackStackEntry?>,
     goToMovieDetails: (route: String, movieId: Long) -> Unit,
+    goToAnimatedCreditCard: (route: String) -> Unit,
     goToMachineLearning: (route: String) -> Unit,
     goToRxJava3Examples: (route: String) -> Unit,
     navigateUp:() -> Unit
@@ -200,6 +205,11 @@ fun NavGraphBuilder.mainNavGraph(
     // https://github.com/amitshekhariitbhu/RxJava2-Android-Samples/blob/master/app/src/main/java/com/rxjava2/android/samples/ui/networking/NetworkingActivity.java
     composable(MainDestinations.ANDROID_POSSIBILITIES) {
         MachineLearningRxJava3(
+            goToAnimatedCreditCard = {
+                if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                    goToAnimatedCreditCard(MainDestinations.ANIMATED_CARD)
+                }
+            },
             goToMachineLearning = {
                 if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
                     goToMachineLearning(MainDestinations.OBJECT_DETECTION)
@@ -219,6 +229,12 @@ fun NavGraphBuilder.mainNavGraph(
         ObjectDetectionScreen(
             viewModel = hiltViewModel()
         )
+    }
+
+    composable(
+        MainDestinations.ANIMATED_CARD
+    ) {
+        AnimatedCard( )
     }
 
     composable(
