@@ -43,6 +43,7 @@ class GeoUtilsTest {
     private var geoUtils: GeoUtils? = null
     @Before
     fun setUp() {
+//        geoUtils = GeoUtils(context = null)
         geoUtils = GeoUtils(geocoder!!)
     }
 

@@ -41,6 +41,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.mvi_compose.ui.MachineLearningRxJava3
 import com.example.mvi_compose.ui.alerts.AlertsScreen
 import com.example.mvi_compose.ui.github_location.GithubLocationScreen
 import com.example.mvi_compose.ui.movies.MovieDetailsScreen
@@ -189,7 +190,8 @@ fun NavGraphBuilder.mainNavGraph(
     // Here on this screen, can I please explain what is happening, how rxjava2 is working and functining with observable, observer and operators
     // https://github.com/amitshekhariitbhu/RxJava2-Android-Samples/blob/master/app/src/main/java/com/rxjava2/android/samples/ui/networking/NetworkingActivity.java
     composable(MainDestinations.RX_JAVA_EXAMPLES) {
-        RxJava3ExamplesScreeen()
+        MachineLearningRxJava3()
+    //        RxJava3ExamplesScreeen()
     }
 
 }

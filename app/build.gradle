@@ -165,4 +165,12 @@ dependencies {
 
     // recyclerView
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
+
+    // tensorflow lite
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.9.0'
+    implementation 'org.tensorflow:tensorflow-lite-task-vision-play-services:0.4.2'
+
+    // camera core
+    implementation 'androidx.camera:camera-core:1.3.2'
+    implementation 'androidx.camera:camera-view:1.3.2'
 }
