@@ -25,9 +25,9 @@ import com.example.mvi_compose.ui.github_location.GithubLocationViewModel
 
 @Composable
 fun MachineLearningRxJava3(
+    goToMachineLearning: () -> Unit,
+    goToRxJava3Examples: () -> Unit
 ) {
-
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -38,7 +38,10 @@ fun MachineLearningRxJava3(
 
         Text(text = "Other possibilities to explore, to see it", modifier = Modifier.padding(vertical = 10.dp))
         Row(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
+                .clickable {
+                    goToMachineLearning()
+                },
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Text(text = "Machine learning")
@@ -51,7 +54,10 @@ fun MachineLearningRxJava3(
             )
         }
         Row(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
+                .clickable {
+                    goToRxJava3Examples()
+                },
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(text = "RxJava3")

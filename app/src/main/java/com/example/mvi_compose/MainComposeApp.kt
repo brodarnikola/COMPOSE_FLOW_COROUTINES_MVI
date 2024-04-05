@@ -46,6 +46,7 @@ import com.example.mvi_compose.ui.alerts.AlertsScreen
 import com.example.mvi_compose.ui.github_location.GithubLocationScreen
 import com.example.mvi_compose.ui.movies.MovieDetailsScreen
 import com.example.mvi_compose.ui.movies.MoviesScreen
+import com.example.mvi_compose.ui.object_detection.ObjectDetectionScreen
 import com.example.mvi_compose.ui.rxJavaExamples.RxJava3ExamplesScreeen
 import com.example.mvi_compose.ui.settings.SettingsScreen
 
@@ -84,15 +85,15 @@ fun bottomNavigationItems(): List<BottomNavigationBarItem> {
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )
-    val rxJavaExamples = BottomNavigationBarItem(
-        title = "RxJavaExamples",
-        route =  MainDestinations.RX_JAVA_EXAMPLES,
+    val lotsOfThings = BottomNavigationBarItem(
+        title = "Android possibilities",
+        route =  MainDestinations.ANDROID_POSSIBILITIES,
         selectedIcon = Icons.Filled.AccountBox,
         unselectedIcon = Icons.Outlined.AccountBox
     )
 
     // creating a list of all the tabs
-    val tabBarItems = listOf(homeTab, alertsTab, locationTab,settingsTab, rxJavaExamples)
+    val tabBarItems = listOf(homeTab, alertsTab, locationTab,settingsTab, lotsOfThings)
     return tabBarItems
 }
 
@@ -142,6 +143,12 @@ fun MainComposeApp(
                     goToMovieDetails =  { route, movieId ->
                         appState.navigateToMovieDetails(route = route, movieId = movieId)
                     },
+                    goToMachineLearning =  { route ->
+                        appState.navigateToMachineLearning(route = route)
+                    },
+                    goToRxJava3Examples =  { route ->
+                        appState.navigateToRxJava3Examples(route = route)
+                    },
                     navigateUp = {
                         appState.upPress()
                     }
@@ -154,6 +161,8 @@ fun MainComposeApp(
 fun NavGraphBuilder.mainNavGraph(
     navBackStackEntry: State<NavBackStackEntry?>,
     goToMovieDetails: (route: String, movieId: Long) -> Unit,
+    goToMachineLearning: (route: String) -> Unit,
+    goToRxJava3Examples: (route: String) -> Unit,
     navigateUp:() -> Unit
 ) {
     composable(MainDestinations.HOME) {
@@ -189,9 +198,33 @@ fun NavGraphBuilder.mainNavGraph(
     }
     // Here on this screen, can I please explain what is happening, how rxjava2 is working and functining with observable, observer and operators
     // https://github.com/amitshekhariitbhu/RxJava2-Android-Samples/blob/master/app/src/main/java/com/rxjava2/android/samples/ui/networking/NetworkingActivity.java
-    composable(MainDestinations.RX_JAVA_EXAMPLES) {
-        MachineLearningRxJava3()
-    //        RxJava3ExamplesScreeen()
+    composable(MainDestinations.ANDROID_POSSIBILITIES) {
+        MachineLearningRxJava3(
+            goToMachineLearning = {
+                if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                    goToMachineLearning(MainDestinations.OBJECT_DETECTION)
+                }
+            },
+            goToRxJava3Examples = {
+                if (navBackStackEntry.value?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                    goToRxJava3Examples(MainDestinations.RX_JAVA_EXAMPLES)
+                }
+            }
+        )
+    }
+
+    composable(
+        MainDestinations.OBJECT_DETECTION
+    ) {
+        ObjectDetectionScreen(
+            viewModel = hiltViewModel()
+        )
+    }
+
+    composable(
+        MainDestinations.RX_JAVA_EXAMPLES
+    ) {
+        RxJava3ExamplesScreeen(  )
     }
 
 }

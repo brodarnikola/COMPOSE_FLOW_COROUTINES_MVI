@@ -13,7 +13,9 @@ object MainDestinations {
     const val LOCATION = "Location"
     const val SETTINGS = "Settings"
     const val MOVIE_DETAILS = "MovieDetails"
+    const val ANDROID_POSSIBILITIES = "Android possibilities"
     const val RX_JAVA_EXAMPLES = "RxJavaExamples"
+    const val OBJECT_DETECTION = "ObjectDetection"
 }
 
 object NavArguments {
@@ -45,6 +47,34 @@ class MainAppState(
     fun navigateToMovieDetails(route: String, movieId: Long) {
         if (route != currentRoute) {
             navController.navigate("$route/$movieId") {
+                launchSingleTop = true
+                restoreState = true
+//                if (popPreviousScreen) {
+//                    popUpTo(navController.currentBackStackEntry?.destination?.route ?: return@navigate) {
+//                        inclusive = true
+//                    }
+//                }
+            }
+        }
+    }
+
+    fun navigateToMachineLearning(route: String) {
+        if (route != currentRoute) {
+            navController.navigate(route) {
+                launchSingleTop = true
+                restoreState = true
+//                if (popPreviousScreen) {
+//                    popUpTo(navController.currentBackStackEntry?.destination?.route ?: return@navigate) {
+//                        inclusive = true
+//                    }
+//                }
+            }
+        }
+    }
+
+    fun navigateToRxJava3Examples(route: String) {
+        if (route != currentRoute) {
+            navController.navigate(route) {
                 launchSingleTop = true
                 restoreState = true
 //                if (popPreviousScreen) {
